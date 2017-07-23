@@ -36,7 +36,7 @@ void Water::update(float) {
     
     int i = 0;
     for(auto& n : _water_texture) {
-        float v = 0.5 + 0.5 * std::sinf(2.0f * 4.0f * M_PI * i++ / (float)height + glfwGetTime());
+        float v = 0.5 + 0.5 * std::sinf(2.0f * 4.0f * M_PI * i++ / (float)height + 8.0f * glfwGetTime());
         n = RGB{v, 1.0f, 0.0f};
     }
     
