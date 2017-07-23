@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <cstdlib>
+#include <chrono>
 #include <memory>
 
 static const char* project_name = "Ripples";
@@ -29,10 +30,10 @@ float tex_coords[8] = {
 struct Camera {
 
 	void update() {
-		glm::vec3 r_axis{0.f, 1.f, 0.f};
-		glm::quat quat = glm::angleAxis(glm::radians(2.f)
-				, r_axis);
-		position = quat * position;
+//		glm::vec3 r_axis{0.f, 1.f, 0.f};
+//		glm::quat quat = glm::angleAxis(glm::radians(2.f)
+//				, r_axis);
+//		position = quat * position;
 
 		view = glm::lookAt(position, glm::vec3(0.f, 0.f, 0.f)
 				, glm::vec3(0.f, 1.f, 0.f));
@@ -75,7 +76,8 @@ struct Opengl {
 		vp_location = glGetUniformLocation(program, "VP");
 		model_location = glGetUniformLocation(program, "M");
 		vpos_location = glGetAttribLocation(program, "vPos");
-		vcol_location = glGetAttribLocation(program, "vCol");
+//		vcol_location = glGetAttribLocation(program, "vCol");
+		vuv_location = glGetAttribLocation(program, "water_uv");
 
 		glGenVertexArrays(1, &vertex_array);
 		glBindVertexArray(vertex_array);
@@ -88,15 +90,15 @@ struct Opengl {
 		glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
 				0, (void*) 0);
 
-		glEnableVertexAttribArray(vcol_location);
-		glVertexAttribPointer(vcol_location, 4, GL_FLOAT, GL_FALSE,
-				0, (void*) (sizeof(float) * 3));
+//		glEnableVertexAttribArray(vcol_location);
+//		glVertexAttribPointer(vcol_location, 4, GL_FLOAT, GL_FALSE,
+//				0, (void*) (sizeof(float) * 3));
 
 		glGenBuffers(1, &uv_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(tex_coords), tex_coords, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glEnableVertexAttribArray(vuv_location);
+		glVertexAttribPointer(vuv_location, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 		glBindVertexArray(0);
 		GL_CHECK_ERROR();
@@ -108,7 +110,7 @@ struct Opengl {
 	}
 
 	GLuint vertex_array, vertex_buffer, uv_buffer, vertex_shader, fragment_shader, program;
-	GLint vp_location, vpos_location, vcol_location, model_location;
+	GLint vp_location, vpos_location, vcol_location, model_location, vuv_location;
 };
 
 int main(int, char**) {
@@ -116,26 +118,39 @@ int main(int, char**) {
 	Glfw glfw{ project_name };
 	Opengl opengl;
 	Camera camera;
-    Water water(1024, 1024);
-	glm::mat4 scale{ 5.f };
+	Water water(1024, 1024);
+	glm::mat4 model{ 5.f };
 
 	while (!glfwWindowShouldClose(glfw.window)) {
-		camera.update();
-        water.update(0.0);
+		const auto last_frame_t = new_frame_t;
+		new_frame_t = std::chrono::high_resolution_clock::now();
+		const std::chrono::duration<float> dt_duration
+				= new_frame_t - last_frame_t;
+		const float dt = dt_duration.count();
 
-		glDisable(GL_CULL_FACE);
+		camera.update();
+		water.update(dt);
+
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, water.texture_id);
+
+		glDisable(GL_CULL_FACE);
+//		glEnable(GL_CULL_FACE);
+//		glCullFace(GL_BACK);
 
 		glUseProgram(opengl.program);
+
 		glUniformMatrix4fv(opengl.vp_location, 1, GL_FALSE, &camera.vp[0][0]);
-		glUniformMatrix4fv(opengl.model_location, 1, GL_FALSE, &scale[0][0]);
+		glUniformMatrix4fv(opengl.model_location, 1, GL_FALSE, &model[0][0]);
+
+		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(opengl.vertex_array);
+		glBindTexture(GL_TEXTURE_2D, water.texture_id);
+
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
 
