@@ -73,30 +73,30 @@ struct Opengl {
 			std::exit(-1);
 
 		vp_location = glGetUniformLocation(program, "VP");
+		model_location = glGetUniformLocation(program, "M");
 		vpos_location = glGetAttribLocation(program, "vPos");
 		vcol_location = glGetAttribLocation(program, "vCol");
 
 		glGenVertexArrays(1, &vertex_array);
 		glBindVertexArray(vertex_array);
 
-		GL_CHECK_ERROR();
 		glGenBuffers(1, &vertex_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
 
-		GL_CHECK_ERROR();
 		glEnableVertexAttribArray(vpos_location);
 		glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
 				0, (void*) 0);
 
-		GL_CHECK_ERROR();
 		glEnableVertexAttribArray(vcol_location);
 		glVertexAttribPointer(vcol_location, 4, GL_FLOAT, GL_FALSE,
 				0, (void*) (sizeof(float) * 3));
 
-		GL_CHECK_ERROR();
+		glGenBuffers(1, &uv_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(tex_coords), tex_coords, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 		glBindVertexArray(0);
 		GL_CHECK_ERROR();
@@ -107,8 +107,8 @@ struct Opengl {
 
 	}
 
-	GLuint vertex_array, vertex_buffer, vertex_shader, fragment_shader, program;
-	GLint vp_location, vpos_location, vcol_location;
+	GLuint vertex_array, vertex_buffer, uv_buffer, vertex_shader, fragment_shader, program;
+	GLint vp_location, vpos_location, vcol_location, model_location;
 };
 
 int main(int, char**) {
@@ -117,6 +117,7 @@ int main(int, char**) {
 	Opengl opengl;
 	Camera camera;
     Water water(1024, 1024);
+	glm::mat4 scale{ 5.f };
 
 	while (!glfwWindowShouldClose(glfw.window)) {
 		camera.update();
@@ -133,6 +134,7 @@ int main(int, char**) {
 
 		glUseProgram(opengl.program);
 		glUniformMatrix4fv(opengl.vp_location, 1, GL_FALSE, &camera.vp[0][0]);
+		glUniformMatrix4fv(opengl.model_location, 1, GL_FALSE, &scale[0][0]);
 		glBindVertexArray(opengl.vertex_array);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);

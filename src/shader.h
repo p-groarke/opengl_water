@@ -7,6 +7,7 @@ static const char* vertex_shader_source = GLSL(
 	layout (location = 1)	in vec4 vCol;
 	layout (location = 2)	in vec2 water_uv;
 	uniform mat4 VP;
+	uniform mat4 M;
 
 //	uniform sampler2D water_displacement;
 
@@ -21,7 +22,7 @@ static const char* vertex_shader_source = GLSL(
 	void main() {
 //		vec3 pos = vPos;
 //		pos.z += texture(water_displacement, water_disp_uv).r;
-		gl_Position = VP * vec4(vPos, 1.0);
+		gl_Position = VP * M * vec4(vPos, 1.0);
 		uv = water_uv;
 //		gl_Position = vec4(vPos, 1.0);
 //		fCol = vCol;
