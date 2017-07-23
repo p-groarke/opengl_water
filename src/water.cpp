@@ -31,13 +31,21 @@ Water::Water(int w, int h) : width(w), height(h) {
 	GL_CHECK_ERROR();
 }
 
+int Water::get_index(int x, int y) {
+    return y * width + x;
+}
+
 void Water::update(float) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
     
-    int i = 0;
-    for(auto& n : _water_texture) {
-        float v = 0.5 + 0.5 * std::sinf(2.0f * 4.0f * M_PI * i++ / (float)height + 8.0f * glfwGetTime());
-        n = RGB{v, 1.0f, 0.0f};
+    
+    const float freq = 8.0f;
+    for(int y = 0; y < height; y++) {
+        for(int x = 0; x < width; x++) {
+            float distance = sqrt(pow(x / (float)width, 2.0) + pow(y / (float)height, 2.0));
+            float v = 0.5 + 0.5 * std::sinf(distance * freq * -M_PI + 4.0f * glfwGetTime());
+            _water_texture[get_index(y, x)] = RGB{v, 1.0f, 0.0f};
+        }
     }
     
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 1024, 0, GL_RGB, GL_FLOAT, &_water_texture[0]);

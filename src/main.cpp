@@ -119,7 +119,7 @@ int main(int, char**) {
 	Opengl opengl;
 	Camera camera;
 	Water water(1024, 1024);
-	glm::mat4 model{ 5.f };
+	glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(5.0f));
 
 	auto new_frame_t = std::chrono::high_resolution_clock::now();
 	while (!glfwWindowShouldClose(glfw.window)) {
