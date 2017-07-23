@@ -121,7 +121,7 @@ int main(int, char**) {
 
 	while (!glfwWindowShouldClose(glfw.window)) {
 		camera.update();
-        water.update();
+        water.update(0.0);
 
 		glDisable(GL_CULL_FACE);
 		glDepthFunc(GL_LEQUAL);

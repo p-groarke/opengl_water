@@ -17,8 +17,6 @@ Water::Water(int w, int h) : width(w), height(h) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-//    std::default_random_engine generator;
-//    std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
     _water_texture.resize(width * height);
 
     int i = 0;
@@ -33,6 +31,14 @@ Water::Water(int w, int h) : width(w), height(h) {
 	GL_CHECK_ERROR();
 }
 
-void Water::update() {
-
+void Water::update(float dt) {
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    
+    int i = 0;
+    for(auto& n : _water_texture) {
+        float v = 0.5 + 0.5 * std::sinf(2.0f * 4.0f * M_PI * i++ / (float)height + dt);
+        n = RGB{v, 1.0f, 0.0f};
+    }
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 1024, 0, GL_RGB, GL_FLOAT, &_water_texture[0]);
 }

@@ -12,7 +12,7 @@ struct RGB {
 struct Water {
     Water(int w, int h);
 
-    void update();
+    void update(float dt);
 
     GLuint texture_id;
     int width, height;
