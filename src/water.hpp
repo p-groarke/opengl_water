@@ -5,6 +5,7 @@
 #include <vector>
 
 struct RGB {
+    typedef float value_type;
     float r, g, b;
 };
 

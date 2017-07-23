@@ -2,6 +2,8 @@
 #include "globals.h"
 #include "glfw.h"
 #include "water.hpp"
+#include "gl/vertex_array.hpp"
+#include "gl/shader.hpp"
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -13,25 +15,9 @@
 
 static const char* project_name = "Ripples";
 
-//static const GLfloat quad[12] = {
-//	-0.5f, -0.5f, 0.0f,
-//	0.5f, -0.5f, 0.0f,
-//	-0.5f, 0.5f, 0.0f,
-//	0.5f, 0.5f, 0.0f
-//};
-
-float tex_coords[12] = {
-	0.0, 1.0, // Top-left.
-	0.0, 0.0, // Bottom-left.
-    1.0, 1.0, // Top-right.
-    
-	
-	1.0, 1.0, // Top-right.
-    0.0, 0.0, // Bottom-left.
-    1.0, 0.0 // Bottom-right.
-};
-
 struct rect {
+    typedef float value_type;
+
     rect(float top, float bottom, float left, float right) :
     data{
         left, top, // Top-left.
@@ -46,23 +32,6 @@ struct rect {
     }
     float data[12];
 };
-
-//static const GLfloat quad[12] = {
-//    -0.5f, 0.5f, 0.0f,  // top left.
-//    -0.5f, -0.5f, 0.0f, // bottom left.
-//    0.5f, 0.5f, 0.0f,    // top right.
-//    0.5f, -0.5f, 0.0f  // bottom right.
-//};
-
-//static const GLfloat quad[12] = {
-//    -0.5f, 0.5f, // top left.
-//    -0.5f, -0.5f, // bottom left.
-//    0.5f, 0.5f, // top right.
-//    
-//    0.5f, 0.5f, // top right.
-//    -0.5f, -0.5f, // bottom left.
-//    0.5f, -0.5f // bottom right.
-//};
 
 struct Camera {
 
@@ -88,50 +57,42 @@ struct Camera {
 
 struct Opengl {
 	Opengl() {
-		vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
-		glCompileShader(vertex_shader);
+        _vertex_shader = gl::shader(gl::shader::type::vertex, std::string(vertex_shader_source));
+        _fragment_shader = gl::shader(gl::shader::type::fragment, std::string(fragment_shader_source));
 
-		fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
-		glCompileShader(fragment_shader);
-
-		program = glCreateProgram();
-		glAttachShader(program, vertex_shader);
-		glAttachShader(program, fragment_shader);
-		glLinkProgram(program);
+        if(!_vertex_shader.compile()) {
+            printf("%s\n", _vertex_shader.get_error_string().c_str());
+            std::exit(-1);
+        }
+        
+        if(!_fragment_shader.compile()) {
+            printf("%s\n", _fragment_shader.get_error_string().c_str());
+            std::exit(-1);
+        }
+        
+        _program.attach_shader(_vertex_shader);
+        _program.attach_shader(_fragment_shader);
+        
+        if(!_program.link()) {
+            printf("%s\n", _program.get_error_string().c_str());
+            std::exit(-1);
+        }
+        
+        printf("TEST\n");
 
 		GL_CHECK_ERROR();
-
-		bool was_init = true;
-		was_init &= gl_shader_was_compiled(vertex_shader);
-		was_init &= gl_shader_was_compiled(fragment_shader);
-		was_init &= gl_program_was_linked(program);
-		if (!was_init)
-			std::exit(-1);
-
-		vp_location = glGetUniformLocation(program, "VP");
-		model_location = glGetUniformLocation(program, "M");
-		vpos_location = glGetAttribLocation(program, "vPos");
-//		vcol_location = glGetAttribLocation(program, "vCol");
-		vuv_location = glGetAttribLocation(program, "water_uv");
-
-		glGenVertexArrays(1, &vertex_array);
-		glBindVertexArray(vertex_array);
-
         
+        _program.activate();
+        vp_location = _program.get_uniform_location("VP");
+        model_location = _program.get_uniform_location("M");
+        vpos_location = _program.get_attribute_location("vPos");
+        // vcol_location = glGetAttribLocation(program, "vCol");
+        vuv_location = _program.get_attribute_location("water_uv");
         
-        
-        
-        
-		glGenBuffers(1, &vertex_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-        
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        printf("loc %d\n", vpos_location);
         
         std::vector<rect> rects;
         std::vector<rect> text_rects;
-        //
         
         for(int j = 0; j < 100; j++) {
             float p0 = j / 100.0f;
@@ -144,27 +105,12 @@ struct Opengl {
             }
         }
         
-		glBufferData(GL_ARRAY_BUFFER, rects.size() * 12 * sizeof(float), &rects[0], GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(vpos_location);
-		glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-				0, (void*) 0);
-
-//		glEnableVertexAttribArray(vcol_location);
-//		glVertexAttribPointer(vcol_location, 4, GL_FLOAT, GL_FALSE,
-//				0, (void*) (sizeof(float) * 3));
-
-		glGenBuffers(1, &uv_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         
-        
-        
-        
-		glBufferData(GL_ARRAY_BUFFER, text_rects.size() * 12 * sizeof(float), &text_rects[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(vuv_location);
-		glVertexAttribPointer(vuv_location, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        _water_plane.set_buffer(vpos_location, rects, 2, 6 * 100 * 100);
+        _water_plane.set_buffer(vuv_location, text_rects, 2, 6 * 100 * 100);
+        _water_plane.set_draw_type(gl::draw_type::triangles);
 
-		glBindVertexArray(0);
 		GL_CHECK_ERROR();
 
 	}
@@ -173,8 +119,12 @@ struct Opengl {
 
 	}
 
-	GLuint vertex_array, vertex_buffer, uv_buffer, vertex_shader, fragment_shader, program;
 	GLint vp_location, vpos_location, vcol_location, model_location, vuv_location;
+    gl::vertex_array<3> _water_plane;
+    
+    gl::shader _vertex_shader;
+    gl::shader _fragment_shader;
+    gl::program _program;
 };
 
 int main(int, char**) {
@@ -207,17 +157,14 @@ int main(int, char**) {
 //		glEnable(GL_CULL_FACE);
 //		glCullFace(GL_BACK);
 
-		glUseProgram(opengl.program);
+        opengl._program.activate();
 
 		glUniformMatrix4fv(opengl.vp_location, 1, GL_FALSE, &camera.vp[0][0]);
 		glUniformMatrix4fv(opengl.model_location, 1, GL_FALSE, &model[0][0]);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindVertexArray(opengl.vertex_array);
-		glBindTexture(GL_TEXTURE_2D, water.texture_id);
-
-		glDrawArrays(GL_TRIANGLES, 0, 6 * 100 * 100);
-		glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, water.texture_id);
+        opengl._water_plane.draw();
 
 		glfw.post_render();
 	}

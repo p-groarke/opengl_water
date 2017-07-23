@@ -11,6 +11,9 @@ set(CMAKE_CXX_STANDARD 14)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c" "src/*.hpp" "src/*.h")
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+file(GLOB_RECURSE GL_SOURCES "src/gl/*.cpp" "src/gl/*.c" "src/gl/*.hpp" "src/gl/*.h")
+source_group("gl" FILES ${GL_SOURCES})
+
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC _HAS_EXCEPTIONS=0
