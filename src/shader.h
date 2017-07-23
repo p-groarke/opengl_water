@@ -21,7 +21,7 @@ static const char* vertex_shader_source = GLSL(
 
 	void main() {
 		vec3 pos = vPos;
-//		pos.z += texture(water_displacement, water_uv).r;
+		pos.z = texture(water_displacement, water_uv).r * 0.1;
 		gl_Position = VP * M * vec4(pos, 1.0);
 		uv = water_uv;
 //		gl_Position = vec4(vPos, 1.0);
@@ -38,7 +38,7 @@ static const char* fragment_shader_source = GLSL(
 
 	void main() {
 
-		color = texture(water_displacement, uv);
-//		color = vec4(0.86, 0.62, 0.86, 0.9f);
+//		color = ;
+		color = vec4(0.02, 0.1, 0.5 + 1.0 - texture(water_displacement, uv).r * 0.5, 0.9f);
 	}\0
 );

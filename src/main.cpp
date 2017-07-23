@@ -13,27 +13,64 @@
 
 static const char* project_name = "Ripples";
 
-static const GLfloat quad[12] = {
-	-0.5f, -0.5f, 0.0f,
-	0.5f, -0.5f, 0.0f,
-	-0.5f, 0.5f, 0.0f,
-	0.5f, 0.5f, 0.0f
-};
+//static const GLfloat quad[12] = {
+//	-0.5f, -0.5f, 0.0f,
+//	0.5f, -0.5f, 0.0f,
+//	-0.5f, 0.5f, 0.0f,
+//	0.5f, 0.5f, 0.0f
+//};
 
-float tex_coords[8] = {
+float tex_coords[12] = {
 	0.0, 1.0, // Top-left.
 	0.0, 0.0, // Bottom-left.
-	1.0, 0.0, // Bottom-right.
-	1.0, 1.0 // Top-right.
+    1.0, 1.0, // Top-right.
+    
+	
+	1.0, 1.0, // Top-right.
+    0.0, 0.0, // Bottom-left.
+    1.0, 0.0 // Bottom-right.
 };
+
+struct rect {
+    rect(float top, float bottom, float left, float right) :
+    data{
+        left, top, // Top-left.
+        left, bottom, // Bottom-left.
+        right, top, // Top-right.
+        
+        
+        right, top, // Top-right.
+        left, bottom, // Bottom-left.
+        right, bottom // Bottom-right.
+    } {
+    }
+    float data[12];
+};
+
+//static const GLfloat quad[12] = {
+//    -0.5f, 0.5f, 0.0f,  // top left.
+//    -0.5f, -0.5f, 0.0f, // bottom left.
+//    0.5f, 0.5f, 0.0f,    // top right.
+//    0.5f, -0.5f, 0.0f  // bottom right.
+//};
+
+//static const GLfloat quad[12] = {
+//    -0.5f, 0.5f, // top left.
+//    -0.5f, -0.5f, // bottom left.
+//    0.5f, 0.5f, // top right.
+//    
+//    0.5f, 0.5f, // top right.
+//    -0.5f, -0.5f, // bottom left.
+//    0.5f, -0.5f // bottom right.
+//};
 
 struct Camera {
 
 	void update() {
-//		glm::vec3 r_axis{0.f, 1.f, 0.f};
-//		glm::quat quat = glm::angleAxis(glm::radians(2.f)
-//				, r_axis);
-//		position = quat * position;
+		glm::vec3 r_axis{0.f, 1.f, 0.f};
+		glm::quat quat = glm::angleAxis(glm::radians(2.f)
+				, r_axis);
+		position = quat * position;
 
 		view = glm::lookAt(position, glm::vec3(0.f, 0.f, 0.f)
 				, glm::vec3(0.f, 1.f, 0.f));
@@ -82,12 +119,35 @@ struct Opengl {
 		glGenVertexArrays(1, &vertex_array);
 		glBindVertexArray(vertex_array);
 
+        
+        
+        
+        
+        
 		glGenBuffers(1, &vertex_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+        
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        
+        std::vector<rect> rects;
+        std::vector<rect> text_rects;
+        //
+        
+        for(int j = 0; j < 100; j++) {
+            float p0 = j / 100.0f;
+            float p1 = (j + 1) / 100.0f;
+            for(int i = 0; i < 100; i++) {
+                float k0 = i / 100.0f;
+                float k1 = (i + 1) / 100.0f;
+                rects.push_back(rect(-0.5f + p0, -0.5 + p1, -0.5 + k0, -0.5 + k1));
+                text_rects.push_back(rect(p0, p1, k0, k1));
+            }
+        }
+        
+		glBufferData(GL_ARRAY_BUFFER, rects.size() * 12 * sizeof(float), &rects[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(vpos_location);
-		glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
+		glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
 				0, (void*) 0);
 
 //		glEnableVertexAttribArray(vcol_location);
@@ -96,7 +156,11 @@ struct Opengl {
 
 		glGenBuffers(1, &uv_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(tex_coords), tex_coords, GL_STATIC_DRAW);
+        
+        
+        
+        
+		glBufferData(GL_ARRAY_BUFFER, text_rects.size() * 12 * sizeof(float), &text_rects[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(vuv_location);
 		glVertexAttribPointer(vuv_location, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
@@ -152,7 +216,7 @@ int main(int, char**) {
 		glBindVertexArray(opengl.vertex_array);
 		glBindTexture(GL_TEXTURE_2D, water.texture_id);
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_TRIANGLES, 0, 6 * 100 * 100);
 		glBindVertexArray(0);
 
 		glfw.post_render();

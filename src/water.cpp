@@ -38,12 +38,12 @@ int Water::get_index(int x, int y) {
 void Water::update(float) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
     
-    
+    //https://www.packtpub.com/books/content/introduction-modern-opengl
     const float freq = 8.0f;
     for(int y = 0; y < height; y++) {
         for(int x = 0; x < width; x++) {
-            float distance = sqrt(pow(x / (float)width, 2.0) + pow(y / (float)height, 2.0));
-            float v = 0.5 + 0.5 * std::sinf(distance * freq * -M_PI + 4.0f * glfwGetTime());
+            float distance = sqrt(pow((0.5 - x) / (float)width, 2.0) + pow((0.5 - y) / (float)height, 2.0));
+            float v = 0.5 + 0.5 * std::sinf(distance * freq * -M_PI + 8.0f * glfwGetTime());
             _water_texture[get_index(y, x)] = RGB{v, 1.0f, 0.0f};
         }
     }
