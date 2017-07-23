@@ -31,12 +31,12 @@ Water::Water(int w, int h) : width(w), height(h) {
 	GL_CHECK_ERROR();
 }
 
-void Water::update(float dt) {
+void Water::update(float) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
     
     int i = 0;
     for(auto& n : _water_texture) {
-        float v = 0.5 + 0.5 * std::sinf(2.0f * 4.0f * M_PI * i++ / (float)height + dt);
+        float v = 0.5 + 0.5 * std::sinf(2.0f * 4.0f * M_PI * i++ / (float)height + glfwGetTime());
         n = RGB{v, 1.0f, 0.0f};
     }
     
