@@ -4,6 +4,11 @@
 #include "glfw.h"
 #include <vector>
 
+struct RGB {
+    float r, g, b;
+};
+
+
 struct Water {
     Water(int w, int h);
 
@@ -11,5 +16,5 @@ struct Water {
 
     GLuint texture_id;
     int width, height;
-    std::vector<float> _water_texture;
+    std::vector<RGB> _water_texture;
 };
