@@ -121,6 +121,7 @@ int main(int, char**) {
 	Water water(1024, 1024);
 	glm::mat4 model{ 5.f };
 
+	auto new_frame_t = std::chrono::high_resolution_clock::now();
 	while (!glfwWindowShouldClose(glfw.window)) {
 		const auto last_frame_t = new_frame_t;
 		new_frame_t = std::chrono::high_resolution_clock::now();

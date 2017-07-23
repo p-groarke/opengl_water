@@ -21,7 +21,7 @@ static const char* vertex_shader_source = GLSL(
 
 	void main() {
 		vec3 pos = vPos;
-//		pos.z += texture(water_displacement, water_uv).r;
+		pos.z += texture(water_displacement, water_uv).r;
 		gl_Position = VP * vec4(pos, 1.0);
 		uv = water_uv;
 //		gl_Position = vec4(vPos, 1.0);
