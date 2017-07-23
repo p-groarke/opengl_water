@@ -1,3 +1,6 @@
+#pragma once
+
+#include <cstdio>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cstdlib>
@@ -68,7 +71,3 @@ struct Glfw {
 	static int width, height;
 	static float window_ratio;
 };
-
-int Glfw::width = 1024;
-int Glfw::height = 576;
-float Glfw::window_ratio = Glfw::width / static_cast<float>(Glfw::height);

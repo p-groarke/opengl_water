@@ -1,6 +1,7 @@
 #include "shader.h"
 #include "globals.h"
 #include "glfw.h"
+#include "water.hpp"
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -100,9 +101,11 @@ int main(int, char**) {
 	Glfw glfw{ project_name };
 	Opengl opengl;
 	Camera camera;
+    Water water(1024, 1024);
 
 	while (!glfwWindowShouldClose(glfw.window)) {
 		camera.update();
+        water.update();
 
 		glDisable(GL_CULL_FACE);
 		glDepthFunc(GL_LEQUAL);
