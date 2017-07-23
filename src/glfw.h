@@ -12,12 +12,14 @@ struct Glfw {
 			std::exit(-1);
 		}
 
+
 		glfwSetErrorCallback(error_callback);
 
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_SAMPLES, samples);
 		if (!(window = glfwCreateWindow(width, height, window_name, nullptr
 				, nullptr)))
 		{
@@ -28,6 +30,13 @@ struct Glfw {
 		glfwMakeContextCurrent(window);
 		gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 		glfwSwapInterval(swap_interval);
+
+		glGetIntegerv(GL_SAMPLES, &samples);
+		if (samples) {
+			printf("MSAA enabled with %d samples\n", samples);
+		} else {
+			printf("MSAA is not be available\n");
+		}
 
 		/* Callbacks */
 		glfwSetKeyCallback(window, key_callback);
@@ -68,6 +77,7 @@ struct Glfw {
 
 	GLFWwindow* window;
 	const unsigned int swap_interval = 1;
+	int samples = 4;
 	static int width, height;
 	static float window_ratio;
 };

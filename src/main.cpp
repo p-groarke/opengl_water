@@ -19,6 +19,13 @@ static const GLfloat quad[12] = {
 	0.5f, 0.5f, 0.0f
 };
 
+float tex_coords[8] = {
+	0.0, 1.0, // Top-left.
+	0.0, 0.0, // Bottom-left.
+	1.0, 0.0, // Bottom-right.
+	1.0, 1.0 // Top-right.
+};
+
 struct Camera {
 
 	void update() {
@@ -72,20 +79,28 @@ struct Opengl {
 		glGenVertexArrays(1, &vertex_array);
 		glBindVertexArray(vertex_array);
 
+		GL_CHECK_ERROR();
 		glGenBuffers(1, &vertex_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
 
+		GL_CHECK_ERROR();
 		glEnableVertexAttribArray(vpos_location);
 		glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
 				0, (void*) 0);
 
+		GL_CHECK_ERROR();
 		glEnableVertexAttribArray(vcol_location);
 		glVertexAttribPointer(vcol_location, 4, GL_FLOAT, GL_FALSE,
 				0, (void*) (sizeof(float) * 3));
 
+		GL_CHECK_ERROR();
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
+
 		glBindVertexArray(0);
 		GL_CHECK_ERROR();
+
 	}
 
 	~Opengl() {
@@ -112,6 +127,9 @@ int main(int, char**) {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, water.texture_id);
 
 		glUseProgram(opengl.program);
 		glUniformMatrix4fv(opengl.vp_location, 1, GL_FALSE, &camera.vp[0][0]);
