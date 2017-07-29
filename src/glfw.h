@@ -12,7 +12,6 @@ struct Glfw {
 			std::exit(-1);
 		}
 
-
 		glfwSetErrorCallback(error_callback);
 
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
