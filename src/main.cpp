@@ -15,27 +15,27 @@
 static const char* project_name = "Ripples";
 
 static const GLfloat quad[] = {
-	-0.5f, -0.5f, 0.0f,
-	0.5f, -0.5f, 0.0f,
-	-0.5f, 0.5f, 0.0f,
-	0.5f, 0.5f, 0.0f
+	-0.5f, -0.5f, 0.0f, // Bottom-left
+	0.5f, -0.5f, 0.0f, // Bottom-right
+	-0.5f, 0.5f, 0.0f, // Top-left
+	0.5f, 0.5f, 0.0f // Top-right
 //	-0.5f, 0.5f, 0.0f,
 //	0.5f, -0.5f, 0.0f,
 //	0.5f, 0.5f, 0.0f
 };
 
-float tex_coords[8] = {
-	0.0, 1.0, // Top-left.
+float tex_coords[] = {
 	0.0, 0.0, // Bottom-left.
 	1.0, 0.0, // Bottom-right.
+	0.0, 1.0, // Top-left.
 	1.0, 1.0 // Top-right.
 };
 
 struct Camera {
 
-	void update() {
+	void update(float dt) {
 		glm::vec3 r_axis{0.f, 1.f, 0.f};
-		glm::quat quat = glm::angleAxis(glm::radians(2.f)
+		glm::quat quat = glm::angleAxis(glm::radians(rotation_speed * dt)
 				, r_axis);
 		position = quat * position;
 
@@ -46,7 +46,8 @@ struct Camera {
 		vp = projection * view;
 	}
 
-	const float fov = 90.f;
+	const float fov = 80.f;
+	const float rotation_speed = 2.f;
 	glm::vec3 position{3.f, 2.f, 2.f};
 	glm::mat4 view;
 	glm::mat4 projection;
@@ -97,7 +98,7 @@ struct Opengl {
 
 		vpos_location = glGetAttribLocation(program, "vPos");
 //		vcol_location = glGetAttribLocation(program, "vCol");
-		vuv_location = glGetAttribLocation(program, "water_uv");
+		vuv_location = glGetAttribLocation(program, "vUv");
 
 		glGenVertexArrays(1, &vertex_array);
 		glBindVertexArray(vertex_array);
@@ -108,7 +109,7 @@ struct Opengl {
 
 		glEnableVertexAttribArray(vpos_location);
 		glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
-				0, (void*) 0);
+				0, (void*)0);
 
 //		glEnableVertexAttribArray(vcol_location);
 //		glVertexAttribPointer(vcol_location, 4, GL_FLOAT, GL_FALSE,
@@ -160,6 +161,8 @@ int main(int, char**) {
 	Camera camera;
 	Water water(1024, 1024);
 	glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(5.0f));
+	model = glm::rotate(model, glm::radians(90.f), {1.f, 0.f, 0.f});
+
 //	glm::mat4 model = glm::mat4(1.0f);
 
 	auto new_frame_t = std::chrono::high_resolution_clock::now();
@@ -170,30 +173,20 @@ int main(int, char**) {
 				= new_frame_t - last_frame_t;
 		const float dt = dt_duration.count();
 
-		camera.update();
+		camera.update(dt);
 		water.update(dt);
 
 		GL_CHECK_ERROR();
 
-//		glBindTexture(GL_TEXTURE_2D, water.texture_id);
-		glBindVertexArray(opengl.vertex_array);
-
 		glPatchParameteri(GL_PATCH_VERTICES, 4);
 		glUniformMatrix4fv(opengl.vp_location, 1, GL_FALSE, &camera.vp[0][0]);
 		glUniformMatrix4fv(opengl.model_location, 1, GL_FALSE, &model[0][0]);
-//		printf("%s\n", glm::to_string(camera.vp).c_str());
-//		glUniform1f(opengl.tlvl_inner_loc, 4);
-//		glUniform1f(opengl.tlvl_outer_loc, 2);
 
-//		glActiveTexture(GL_TEXTURE0);
-
-//		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glBindVertexArray(opengl.vertex_array);
 		glDrawArrays(GL_PATCHES, 0, 4);
-//		glDrawElements(GL_PATCHES, 4, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		glfw.post_render();
-//		glClearColor(0.5, 0.5, 1.f, 1.f);
 		GL_CHECK_ERROR();
 	}
 

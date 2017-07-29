@@ -1,6 +1,6 @@
 #pragma once
 
-#define GLSL(...) "#version 410 core\n"#__VA_ARGS__//\0
+#define GLSL(...) "#version 410 core\n"#__VA_ARGS__"\0"
 
 static const char* vertex_shader_source = GLSL(
 	layout (location = 0)	in vec3 vPos;
@@ -10,7 +10,7 @@ static const char* vertex_shader_source = GLSL(
 	void main() {
 		tcUv = vUv;
 		gl_Position = vec4(vPos, 1.0);
-	}\0
+	}
 );
 
 static const char* tess_control_shader_source = GLSL(
@@ -30,7 +30,7 @@ static const char* tess_control_shader_source = GLSL(
 
 		gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 		teUv[gl_InvocationID] = tcUv[gl_InvocationID];
-	}\0
+	}
 );
 
 static const char* tess_eval_shader_source = GLSL(
@@ -48,13 +48,15 @@ static const char* tess_eval_shader_source = GLSL(
 		vec4 p2 = mix(gl_in[2].gl_Position,
 				gl_in[3].gl_Position,
 				gl_TessCoord.x);
+		vec4 world_pos = M * mix(p2, p1, gl_TessCoord.y);
 
-		vec4 local_pos = mix(p1, p2, gl_TessCoord.y);
-		local_pos.z += texture(water_disp, gl_TessCoord.xy).r * 0.1;
+		vec2 uv1 = mix(teUv[0], teUv[1], gl_TessCoord.x);
+		vec2 uv2 = mix(teUv[2], teUv[3], gl_TessCoord.x);
+		fUv = mix(uv2, uv1, gl_TessCoord.y);
 
-		gl_Position = VP * M * local_pos;
-		fUv = gl_TessCoord.xy;
-	}\0
+		world_pos.y += texture(water_disp, fUv).r * 0.5;
+		gl_Position = VP * world_pos;
+	}
 );
 
 static const char* fragment_shader_source = GLSL(
@@ -63,6 +65,10 @@ static const char* fragment_shader_source = GLSL(
 	uniform sampler2D water_disp;
 
 	void main() {
-		color = vec4(0.02, 0.1, 1.0 - texture(water_disp, fUv).r * 0.5, 1.0);
-	}\0
+		vec4 dark_base_color = vec4(0.08, 0.16, 0.16, 1.0);
+		vec4 light_base_color = vec4(0.73, 0.77, 0.80, 1.0);
+		float disp = texture(water_disp, fUv).r;
+		vec4 c = mix(dark_base_color, light_base_color, pow(disp, 2.0));
+		color = c;
+	}
 );
