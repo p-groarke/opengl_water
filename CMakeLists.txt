@@ -39,6 +39,7 @@ endif()
 find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENGL_LIBRARIES})
 
+# Platform dependencies.
 if (APPLE)
 	find_library(COCOA_LIB Cocoa)
 	find_library(IOKIT_LIB IOKit)
@@ -47,10 +48,10 @@ if (APPLE)
 		${IOKIT_LIB} ${COREVIDEO_LIB})
 endif()
 
+# Forward cmake args to external dependencies.
 get_cmake_property(CACHE_VARS CACHE_VARIABLES)
 foreach(CACHE_VAR ${CACHE_VARS})
-	get_property(CACHE_VAR_HELPSTRING CACHE ${CACHE_VAR}
-		PROPERTY HELPSTRING)
+	get_property(CACHE_VAR_HELPSTRING CACHE ${CACHE_VAR} PROPERTY HELPSTRING)
 
 	if(CACHE_VAR_HELPSTRING
 			STREQUAL "No help, variable specified on the command line.")
@@ -64,9 +65,10 @@ foreach(CACHE_VAR ${CACHE_VARS})
 	set(CMAKE_ARGS "${CMAKE_ARGS}
 		-D${CACHE_VAR}${CACHE_VAR_TYPE}=\"${${CACHE_VAR}}\"")
 	endif()
-	endforeach()
+endforeach()
 message("CMAKE_ARGS: ${CMAKE_ARGS}")
 
+# External dependencies.
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_BINARY_DIR}/include)
 
@@ -79,12 +81,20 @@ ExternalProject_Add(glad_ext
 		-DGLAD_PROFILE="core"
 		-DGLAD_API="gl=4.1"
 		-DGLAD_INSTALL=On
+	UPDATE_COMMAND ""
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE glad)
 
-#set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-#set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-#set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+ExternalProject_Add(glm_ext
+	GIT_REPOSITORY https://github.com/g-truc/glm.git
+	GIT_TAG 0.9.8.4
+	CMAKE_ARGS ${CMAKE_ARGS}
+		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
+		-DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}
+	UPDATE_COMMAND ""
+)
+target_link_libraries(${PROJECT_NAME} INTERFACE glm)
+
 ExternalProject_Add(glfw3_ext
 	GIT_REPOSITORY https://github.com/glfw/glfw.git
 	GIT_TAG 3.2.1
@@ -94,15 +104,8 @@ ExternalProject_Add(glfw3_ext
 		-DGLFW_BUILD_DOCS=Off
 		-DGLFW_BUILD_TESTS=Off
 		-DGLFW_BUILD_EXAMPLES=Off
+	UPDATE_COMMAND ""
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw3)
-
-ExternalProject_Add(glm_ext
-	GIT_REPOSITORY https://github.com/g-truc/glm.git
-	GIT_TAG 0.9.8.4
-	CMAKE_ARGS ${CMAKE_ARGS}
-		-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}
-		-DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}
-)
-target_link_libraries(${PROJECT_NAME} INTERFACE glm)
 add_dependencies(${PROJECT_NAME} glad_ext glfw3_ext glm_ext)
+
