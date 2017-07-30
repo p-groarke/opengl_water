@@ -3,15 +3,8 @@
 #include <cstdio>
 #include <cstring>
 
-#define OUTPUT_ERROR(format, ...) \
-	printf("%s(%d) : %s() : " format "\n" \
-	, __FILE__, __LINE__, __func__, ##__VA_ARGS__)
-
-#define OUTPUT_MSG(format, ...) \
-	printf("" format "\n", ##__VA_ARGS__)
-
 static char _err[64] = "";
-#define GL_CHECK_ERROR() 	{ \
+#define GL_CHECK_ERROR()	{ \
 	gl_error_string(_err); \
 	if (strlen(_err) != 0) { \
 		OUTPUT_ERROR("OpenGL error : %s", _err); \
@@ -65,3 +58,4 @@ static inline void gl_error_string(char* msg) {
 #endif
 	}
 }
+

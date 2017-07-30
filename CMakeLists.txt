@@ -21,18 +21,18 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra #-Wpedantic
-		-Werror -fno-exceptions -fno-rtti)
+		-Werror -fno-exceptions)# -fno-rtti)
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra #-Wpedantic
-		-Werror -fno-exceptions -fno-rtti)
+		-Werror -fno-exceptions)# -fno-rtti)
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel C++
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
-	target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX /GR-)
+	target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)# /GR-)
 
 endif()
 
@@ -109,3 +109,10 @@ ExternalProject_Add(glfw3_ext
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw3)
 add_dependencies(${PROJECT_NAME} glad_ext glfw3_ext glm_ext)
 
+# Copy shaders on build.
+file(GLOB_RECURSE SHADERS "src/shaders/*.glsl")
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SHADERS} $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/
+)

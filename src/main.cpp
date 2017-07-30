@@ -1,16 +1,15 @@
 #include "shader.h"
-#include "globals.h"
-#include "glfw.h"
-#include "water.hpp"
-
-#include <glm/ext.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "engine/globals.h"
+#include "engine/glfw.h"
+#include "engine/opengl.h"
+#include "engine/entity.h"
+#include "components/camera.h"
+#include "components/renderer.h"
 
 #include <cstdlib>
 #include <chrono>
 #include <memory>
+#include <vector>
 
 static const char* project_name = "Ripples";
 
@@ -29,29 +28,6 @@ float tex_coords[] = {
 	1.0, 0.0, // Bottom-right.
 	0.0, 1.0, // Top-left.
 	1.0, 1.0 // Top-right.
-};
-
-struct Camera {
-
-	void update(float dt) {
-		glm::vec3 r_axis{0.f, 1.f, 0.f};
-		glm::quat quat = glm::angleAxis(glm::radians(rotation_speed * dt)
-				, r_axis);
-		position = quat * position;
-
-		view = glm::lookAt(position, glm::vec3(0.f, 0.f, 0.f)
-				, glm::vec3(0.f, 1.f, 0.f));
-		projection = glm::perspective(glm::radians(fov)
-				, Glfw::window_ratio, 0.1f, 100.0f);
-		vp = projection * view;
-	}
-
-	const float fov = 80.f;
-	const float rotation_speed = 2.f;
-	glm::vec3 position{3.f, 2.f, 2.f};
-	glm::mat4 view;
-	glm::mat4 projection;
-	glm::mat4 vp;
 };
 
 struct Opengl {
@@ -92,6 +68,7 @@ struct Opengl {
 
 		vp_location = glGetUniformLocation(program, "VP");
 		model_location = glGetUniformLocation(program, "M");
+		time_loc = glGetUniformLocation(program, "time");
 //		tlvl_inner_loc = glGetUniformLocation(program, "TessLevelInner");
 //		tlvl_outer_loc = glGetUniformLocation(program, "TessLevelOuter");
 
@@ -151,15 +128,22 @@ struct Opengl {
 	GLuint vertex_array, vertex_buffer, uv_buffer, vertex_shader, fragment_shader
 		, tess_control_shader, tess_eval_shader, program;
 	GLint vp_location, vpos_location, vcol_location, model_location, vuv_location
-		, tlvl_inner_loc, tlvl_outer_loc;
+		, tlvl_inner_loc, tlvl_outer_loc, time_loc;
 };
 
 int main(int, char**) {
 	printf("%s\n", project_name);
 	Glfw glfw{ project_name };
 	Opengl opengl;
-	Camera camera;
-	Water water(1024, 1024);
+
+	std::vector<Entity> entities;
+	Entity camera;
+	camera.add_component<Camera>();
+	Renderer* cam_render = camera.add_component<Renderer>();
+	cam_render->set_shader_path("shaders/");
+	cam_render->load_vertex_shader("water_vertex.glsl");
+
+//	Camera camera;
 	glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(5.0f));
 	model = glm::rotate(model, glm::radians(90.f), {1.f, 0.f, 0.f});
 
@@ -173,14 +157,15 @@ int main(int, char**) {
 				= new_frame_t - last_frame_t;
 		const float dt = dt_duration.count();
 
-		camera.update(dt);
-		water.update(dt);
+		camera.get_component<Camera>()->update(dt);
 
 		GL_CHECK_ERROR();
 
 		glPatchParameteri(GL_PATCH_VERTICES, 4);
-		glUniformMatrix4fv(opengl.vp_location, 1, GL_FALSE, &camera.vp[0][0]);
+		glUniformMatrix4fv(opengl.vp_location, 1, GL_FALSE
+				, &camera.get_component<Camera>()->vp[0][0]);
 		glUniformMatrix4fv(opengl.model_location, 1, GL_FALSE, &model[0][0]);
+		glUniform1f(opengl.time_loc, glfwGetTime());
 
 		glBindVertexArray(opengl.vertex_array);
 		glDrawArrays(GL_PATCHES, 0, 4);
