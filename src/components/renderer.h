@@ -1,64 +1,50 @@
 #pragma once
 #include "engine/component.h"
-#include "engine/globals.h"
+#include "engine/glfw.h"
 
-#include <fstream>
 #include <string>
-#include <vector>
-
+#include <limits>
 
 struct Renderer : public Component {
 	struct Shader {
-		GLenum type;
-		GLuint handle;
+		Shader(GLenum _type)
+			: type(_type)
+			, handle(std::numeric_limits<unsigned>::max())
+		{}
+
+		bool invalid() {
+			return handle == std::numeric_limits<unsigned>::max();
+		}
+
+		const GLenum type = 0;
+		GLuint handle = 0;
 	};
 
-	void set_shader_path(const std::string& path) {
-		_relative_path = path;
-	}
-
-	void load_vertex_shader(const std::string& filename) {
-		vertex_shader = load_shader_src(GL_VERTEX_SHADER, filename);
-	}
-
-	void init() {
-
-	}
+	void set_shader_path(const std::string& path);
+	void load_shader(GLenum shader_type, const std::string& filename);
+	void create();
+	void init() override;
+	void render(float dt) override;
+	void destroy() override;
 
 	GLuint program;
-	Shader vertex_shader;
-	Shader tess_control_shader;
-	Shader tess_eval_shader;
-	Shader geometry_shader;
-	Shader fragment_shader;
 
 private:
-	Shader load_shader_src(GLenum type, const std::string& filename) {
-		std::ifstream f(_relative_path + filename);
-		if (!f.is_open()) {
-			OUTPUT_ERROR("Couldn't read shader file : %s/%s"
-					, _relative_path.c_str(), filename.c_str());
-			std::exit(-1);
-		}
+	Renderer::Shader& get_shader(GLenum shader_type);
 
-		f.seekg(0, std::ios::end);
-		size_t size = f.tellg();
-		std::string buffer;
-		buffer.reserve(size);
-		f.seekg(0);
-		f.read(&buffer[0], size);
+	static constexpr size_t _shader_count = 5;
+	Shader _shaders[_shader_count] = {
+		{ GL_VERTEX_SHADER }
+		, { GL_TESS_CONTROL_SHADER }
+		, { GL_TESS_EVALUATION_SHADER }
+		, { GL_GEOMETRY_SHADER }
+		, { GL_FRAGMENT_SHADER }
+	};
 
-		Shader ret;
-		ret.handle = glCreateShader(type);
-		const char* src = buffer.c_str();
-		glShaderSource(ret.handle, 1, &src, NULL);
-		glCompileShader(ret.handle);
-		if (!gl_shader_was_compiled(ret.handle)) {
-			std::exit(-1);
-		}
-
-		return ret;
-	}
-
+	#define vertex_shader _shaders[0];
+	#define tess_control_shader _shaders[1];
+	#define tess_eval_shader _shaders[2];
+	#define geometry_shader _shaders[3];
+	#define fragment_shader _shaders[4];
 	std::string _relative_path = "";
 };

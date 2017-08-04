@@ -1,4 +1,4 @@
-#version 410 core\n
+#version 410 core
 layout(quads, equal_spacing, ccw) in;
 in vec2 teUv[];
 out vec2 fUv;

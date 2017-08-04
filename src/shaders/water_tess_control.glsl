@@ -1,4 +1,4 @@
-#version 410 core\n
+#version 410 core
 layout (vertices = 4) out;
 in vec2 tcUv[];
 out vec2 teUv[];

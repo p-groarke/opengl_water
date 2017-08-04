@@ -1,13 +1,7 @@
 #pragma once
-#include "globals.h"
+#include "engine/globals.h"
 
-#include <glm/ext.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <memory>
-#include <vector>
+struct Entity;
 
 struct Component {
 	virtual void init() {}
@@ -15,6 +9,5 @@ struct Component {
 	virtual void render(float) {}
 	virtual void destroy() {}
 
-	virtual ~Component() = 0;
+	Entity* entity = nullptr;
 };
-Component::~Component() {}
