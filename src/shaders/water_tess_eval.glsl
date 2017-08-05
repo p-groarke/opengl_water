@@ -5,22 +5,13 @@ out vec2 fUv;
 out vec4 fWorld_pos;
 uniform mat4 VP;
 uniform mat4 M;
-uniform sampler2D water_disp;
 uniform float time;
 const float M_PI = 3.1415926535;
 
 float water_displacement(vec2 pos) {
-	const float freq = 3.0;
-//		float distance = sqrt(pow(0.5 - pos.x, 2.0)
-//				+ pow(0.5 - pos.y, 2.0));
-//		float v = 0.5 + 0.5 * sin(distance * freq * -M_PI
-//				+ freq * time);
-//		return v * 0.5;
-//		return 0.5 + 0.5 * sin(sqrt(pow(pos.x, 2.0) + pow(pos.y, 2.0))
-//				* -M_PI * freq + freq * time);
-	float d = length(pos);
-	return (0.5 + 0.5 * sin(-M_PI * d * freq + time));
-//		return sin(freq + time);
+	const float freq = 0.8;
+	float d = length(pos + vec2(50, 500));
+	return (0.5 + 0.4 * sin(-M_PI * d * freq + time));
 }
 
 void main() {
@@ -33,7 +24,6 @@ void main() {
 	vec4 local_pos = mix(p2, p1, gl_TessCoord.y);
 	fWorld_pos = M * local_pos;
 	fWorld_pos.y += water_displacement(fWorld_pos.xz);
-
 	gl_Position = VP * fWorld_pos;
 
 	vec2 uv1 = mix(teUv[0], teUv[1], gl_TessCoord.x);
