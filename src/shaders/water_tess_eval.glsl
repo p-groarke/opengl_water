@@ -10,7 +10,7 @@ uniform float time;
 const float M_PI = 3.1415926535;
 
 float water_displacement(vec2 pos) {
-	const float freq = 1.0;//8.0;
+	const float freq = 3.0;
 //		float distance = sqrt(pow(0.5 - pos.x, 2.0)
 //				+ pow(0.5 - pos.y, 2.0));
 //		float v = 0.5 + 0.5 * sin(distance * freq * -M_PI
@@ -32,10 +32,8 @@ void main() {
 			gl_TessCoord.x);
 	vec4 local_pos = mix(p2, p1, gl_TessCoord.y);
 	fWorld_pos = M * local_pos;
-//		fWorld_pos.y += water_displacement(local_pos.xy);
-
-//		world_pos.y += texture(water_disp, fUv).r * 0.5;
 	fWorld_pos.y += water_displacement(fWorld_pos.xz);
+
 	gl_Position = VP * fWorld_pos;
 
 	vec2 uv1 = mix(teUv[0], teUv[1], gl_TessCoord.x);

@@ -1,7 +1,7 @@
 #include "components/camera.h"
 
 #include "engine/entity.h"
-#include "engine/glfw.h"
+#include "engine/window.h"
 #include "components/transform.h"
 
 Camera::Camera() {
@@ -19,7 +19,7 @@ glm::mat4 Camera::get_view() {
 }
 
 glm::mat4 Camera::get_projection() {
-	return glm::perspective(glm::radians(fov), Glfw::window_ratio
+	return glm::perspective(glm::radians(fov), Window::main->window_ratio
 			, near_plane, far_plane);
 }
 

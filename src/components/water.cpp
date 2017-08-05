@@ -1,6 +1,6 @@
 #include "components/water.h"
 #include "engine/entity.h"
-#include "engine/opengl.h"
+#include "engine/window.h"
 #include "components/transform.h"
 #include "components/renderer.h"
 #include "components/camera.h"
@@ -87,8 +87,6 @@ void Water::render(float) {
 //	glEnable(GL_CULL_FACE);
 //	glCullFace(GL_BACK);
 
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	glUseProgram(_renderer->program);
 

@@ -110,9 +110,29 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glfw3)
 add_dependencies(${PROJECT_NAME} glad_ext glfw3_ext glm_ext)
 
 # Copy shaders on build.
-file(GLOB_RECURSE SHADERS "src/shaders/*.glsl")
+set(SHADER_IN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders)
+set(SHADER_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
+file(GLOB_RECURSE SHADERS "${SHADER_IN_DIR}/*.glsl")
+
 add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SHADERS} $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/
-)
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_OUT_DIR})
+
+# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+# 	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SHADERS} $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/
+# )
+
+set(SHADERS_OUT "")
+foreach(shdr ${SHADERS})
+	get_filename_component(shdr_file ${shdr} NAME)
+	add_custom_command(
+		OUTPUT ${SHADER_OUT_DIR}/${shdr_file}
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${shdr} ${SHADER_OUT_DIR}
+		DEPENDS ${shdr}
+	)
+	list(APPEND SHADERS_OUT ${SHADER_OUT_DIR}/${shdr_file})
+endforeach()
+
+add_custom_target(copy_shaders ALL
+	DEPENDS ${SHADERS_OUT})
+add_dependencies(${PROJECT_NAME} copy_shaders)
+

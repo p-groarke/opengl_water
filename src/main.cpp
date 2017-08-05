@@ -1,10 +1,10 @@
 #include "engine/globals.h"
-#include "engine/glfw.h"
-#include "engine/opengl.h"
+#include "engine/window.h"
 #include "engine/entity.h"
 #include "components/camera.h"
 #include "components/rotation_camera.h"
 #include "components/water.h"
+#include "components/renderer.h"
 
 #include <cstdlib>
 #include <chrono>
@@ -12,7 +12,7 @@
 #include <vector>
 
 static const char* project_name = "Ripples";
-Glfw glfw{ project_name };
+Window window{ project_name };
 
 int main(int, char**) {
 	printf("%s\n", project_name);
@@ -31,7 +31,7 @@ int main(int, char**) {
 //	for (const auto& x : entities) {
 //		x->init();
 //	}
-	while (!glfwWindowShouldClose(glfw.window)) {
+	while (!glfwWindowShouldClose(window.window)) {
 		const auto last_frame_t = new_frame_t;
 		new_frame_t = std::chrono::high_resolution_clock::now();
 		const std::chrono::duration<float> dt_duration
@@ -46,7 +46,7 @@ int main(int, char**) {
 			x->render(dt);
 		}
 
-		glfw.post_render();
+		window.post_render();
 		GL_CHECK_ERROR();
 	}
 
