@@ -6,18 +6,39 @@ set(${PROJECT_NAME}_VERSION 1.0.0)
 include (ExternalProject)
 link_directories(${CMAKE_CURRENT_BINARY_DIR}/lib)
 
-set(CMAKE_CXX_STANDARD 14)
+# Organize unrelated targets to clean IDE hierarchy.
+set(DEPENDENCY_FOLDER "Dependencies")
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ${DEPENDENCY_FOLDER})
+# set(CMAKE_SUPPRESS_REGENERATION TRUE)
+
+# Output binary to predictable location (fixes cyclic dependency issues).
+set(BINARY_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUT_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BINARY_OUT_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${BINARY_OUT_DIR})
+
+foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+	string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${BINARY_OUT_DIR})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${BINARY_OUT_DIR})
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${BINARY_OUT_DIR})
+endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
+
+
+set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_BUILD_TYPE Release)
+
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.c" "src/*.hpp" "src/*.h")
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC _HAS_EXCEPTIONS=0
-	_STATIC_CPPLIB=1 ENABLE_PROFILING=0)
+# target_compile_definitions(${PROJECT_NAME} PUBLIC _HAS_EXCEPTIONS=0
+# 	_STATIC_CPPLIB=1 ENABLE_PROFILING=0)
 
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY
-	VS_STARTUP_PROJECT ${PROJECT_NAME})
+# set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY
+# 	VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra #-Wpedantic
@@ -39,7 +60,9 @@ endif()
 find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENGL_LIBRARIES})
 
+##
 # Platform dependencies.
+##
 if (APPLE)
 	find_library(COCOA_LIB Cocoa)
 	find_library(IOKIT_LIB IOKit)
@@ -48,7 +71,9 @@ if (APPLE)
 		${IOKIT_LIB} ${COREVIDEO_LIB})
 endif()
 
+##
 # Forward cmake args to external dependencies.
+##
 get_cmake_property(CACHE_VARS CACHE_VARIABLES)
 foreach(CACHE_VAR ${CACHE_VARS})
 	get_property(CACHE_VAR_HELPSTRING CACHE ${CACHE_VAR} PROPERTY HELPSTRING)
@@ -66,9 +91,10 @@ foreach(CACHE_VAR ${CACHE_VARS})
 		-D${CACHE_VAR}${CACHE_VAR_TYPE}=\"${${CACHE_VAR}}\"")
 	endif()
 endforeach()
-message("CMAKE_ARGS: ${CMAKE_ARGS}")
 
+##
 # External dependencies.
+##
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_BINARY_DIR}/include)
 
@@ -107,32 +133,37 @@ ExternalProject_Add(glfw3_ext
 	UPDATE_COMMAND ""
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw3)
+
+set_target_properties(glad_ext glfw3_ext glm_ext PROPERTIES FOLDER ${DEPENDENCY_FOLDER})
 add_dependencies(${PROJECT_NAME} glad_ext glfw3_ext glm_ext)
 
+##
 # Copy shaders on build.
+##
 set(SHADER_IN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders)
-set(SHADER_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/shaders)
+set(SHADER_OUT_DIR ${BINARY_OUT_DIR}/shaders)
+set(STAMP_DIR ${CMAKE_CURRENT_BINARY_DIR}/.stamps)
+
 file(GLOB_RECURSE SHADERS "${SHADER_IN_DIR}/*.glsl")
 
-add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_OUT_DIR})
-
-# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-# 	COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SHADERS} $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/
-# )
-
-set(SHADERS_OUT "")
-foreach(shdr ${SHADERS})
-	get_filename_component(shdr_file ${shdr} NAME)
+set(STAMP_FILES "")
+foreach(SHADER ${SHADERS})
+	get_filename_component(SHADER_FILENAME ${SHADER} NAME)
+	set(STAMP_FILE ${STAMP_DIR}/${SHADER_FILENAME}.stamp)
 	add_custom_command(
-		OUTPUT ${SHADER_OUT_DIR}/${shdr_file}
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${shdr} ${SHADER_OUT_DIR}
-		DEPENDS ${shdr}
+		OUTPUT ${STAMP_FILE}
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${STAMP_DIR}
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_OUT_DIR}
+		COMMAND ${CMAKE_COMMAND} -E touch ${STAMP_FILE}
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SHADER} ${SHADER_OUT_DIR}/${SHADER_FILENAME} #$<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/${SHADER_FILENAME}
+		DEPENDS ${SHADER}
 	)
-	list(APPEND SHADERS_OUT ${SHADER_OUT_DIR}/${shdr_file})
+	list(APPEND STAMP_FILES ${STAMP_FILE})
 endforeach()
 
-add_custom_target(copy_shaders ALL
-	DEPENDS ${SHADERS_OUT})
-add_dependencies(${PROJECT_NAME} copy_shaders)
-
+# Display shaders in IDE, in main project folder.
+add_custom_target(Shaders
+	SOURCES ${SHADERS}
+	DEPENDS ${STAMP_FILES})
+set_target_properties(Shaders PROPERTIES FOLDER ${PROJECT_NAME}) # Pretty hacky :)
+add_dependencies(${PROJECT_NAME} Shaders)

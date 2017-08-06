@@ -35,10 +35,10 @@ void Renderer::set_shader_path(const std::string& path) {
 }
 
 void Renderer::load_shader(GLenum shader_type, const std::string& filename) {
-	std::ifstream f(_relative_path + filename, std::ios::binary | std::ios::ate);
+	std::string path = app::executable_dir + _relative_path + filename;
+	std::ifstream f(path, std::ios::binary | std::ios::ate);
 	if (!f.is_open()) {
-		OUTPUT_ERROR("Couldn't read shader file : %s%s"
-				, _relative_path.c_str(), filename.c_str());
+		OUTPUT_ERROR("Couldn't read shader file : %s", path.c_str());
 		std::exit(-1);
 	}
 
@@ -57,8 +57,7 @@ void Renderer::load_shader(GLenum shader_type, const std::string& filename) {
 	glCompileShader(ret.handle);
 
 	if (!gl_shader_was_compiled(ret.handle)) {
-		OUTPUT_MSG("In shader file : %s%s"
-				, _relative_path.c_str(), filename.c_str());
+		OUTPUT_MSG("In shader file : %s", path.c_str());
 		std::exit(-1);
 	}
 }
