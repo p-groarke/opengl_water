@@ -4,12 +4,14 @@
 #include <cstdlib>
 
 namespace {
-	inline Window* get_this(GLFWwindow* window) {
-		return reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	}
-} // anonymous
+inline Window* get_this(GLFWwindow* window)
+{
+	return reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+}
+} // namespace
 
-Window::Window(const char* window_name) {
+Window::Window(const char* window_name)
+{
 	if (!glfwInit()) {
 		printf("Couldn't initialize GLFW.\nExiting...\n");
 		std::exit(-1);
@@ -25,15 +27,13 @@ Window::Window(const char* window_name) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, samples);
-	if (!(window = glfwCreateWindow(width, height, window_name, nullptr
-			, nullptr)))
-	{
+	if (!(window = glfwCreateWindow(width, height, window_name, nullptr, nullptr))) {
 		printf("Couldn't create window.\nExiting...\n");
 		std::exit(-1);
 	}
 
 	glfwMakeContextCurrent(window);
-	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	glfwSwapInterval(swap_interval);
 
 	glGetIntegerv(GL_SAMPLES, &samples);
@@ -51,24 +51,26 @@ Window::Window(const char* window_name) {
 	glfwSetScrollCallback(window, scroll_callback);
 }
 
-Window::~Window() {
+Window::~Window()
+{
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
 
-void Window::post_render() {
+void Window::post_render()
+{
 	glfwSwapBuffers(window);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glfwPollEvents();
 }
 
 /* Callbacks. */
-void Window::error_callback(int error, const char* description) {
+void Window::error_callback(int error, const char* description)
+{
 	OUTPUT_ERROR("Error: %d - %s", error, description);
 }
 
-void Window::key_callback(GLFWwindow* window_, int key, int
-		, int action, int)
+void Window::key_callback(GLFWwindow* window_, int key, int, int action, int)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window_, GLFW_TRUE);
@@ -84,9 +86,11 @@ void Window::resize_callback(GLFWwindow* window, int width_, int height_)
 }
 
 void Window::mouse_callback(GLFWwindow*, double, double)
-{}
+{
+}
 
 void Window::scroll_callback(GLFWwindow*, double, double)
-{}
+{
+}
 
 Window* Window::main = nullptr;

@@ -8,9 +8,9 @@
 
 struct Transform;
 
-struct Camera : public Component {
+struct Camera {
 	Camera();
-	void init() override;
+	void init(ts::Entity entity);
 	glm::mat4 get_view();
 	glm::mat4 get_projection();
 	glm::mat4 get_view_projection();

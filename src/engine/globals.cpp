@@ -2,4 +2,4 @@
 
 namespace app {
 std::string executable_dir = "";
-} //namespace app
+} // namespace app

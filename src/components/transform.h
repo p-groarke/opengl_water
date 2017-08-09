@@ -6,9 +6,10 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-struct Transform : public Component {
-	/* Or this cou;d be done in update... Probly not. */
-	glm::mat4 get_model() {
+struct Transform {
+	/* Or this could be done in update... Probly not. */
+	glm::mat4 get_model()
+	{
 		glm::mat4 ret{ 1.f };
 		ret = glm::scale(ret, scale);
 
@@ -17,6 +18,11 @@ struct Transform : public Component {
 
 		ret = glm::translate(ret, position);
 		return ret;
+	}
+
+	static constexpr bool is_data()
+	{
+		return true;
 	}
 
 	glm::vec3 position{ 0.f, 0.f, 0.f };

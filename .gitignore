@@ -32,3 +32,4 @@
 /[Bb]uild*/
 
 cmake-xcode
+cmake-build
