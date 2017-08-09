@@ -1,9 +1,10 @@
 #pragma once
-#include "engine/component.h"
+#include "engine/entity.h"
 #include "components/camera.h"
 #include "components/transform.h"
 
-struct RotationCamera {
+class RotationCamera {
+public:
 	void init(ts::Entity entity)
 	{
 		_camera = entity.add_component<Camera>();

@@ -1,10 +1,11 @@
 #pragma once
-#include "engine/component.h"
+#include "engine/entity.h"
 
-struct Transform;
-struct Renderer;
+class Transform;
+class Renderer;
 
-struct Water {
+class Water {
+public:
 	void init(ts::Entity entity);
 	void update(ts::Entity entity, float dt);
 	void render(ts::Entity entity, float dt);

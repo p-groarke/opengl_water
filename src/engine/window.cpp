@@ -1,5 +1,6 @@
 #include "window.h"
 #include "globals.h"
+#include "engine/entity.h"
 
 #include <cstdlib>
 
@@ -72,8 +73,10 @@ void Window::error_callback(int error, const char* description)
 
 void Window::key_callback(GLFWwindow* window_, int key, int, int action, int)
 {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window_, GLFW_TRUE);
+		return;
+	}
 }
 
 void Window::resize_callback(GLFWwindow* window, int width_, int height_)

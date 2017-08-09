@@ -28,5 +28,13 @@
 #endif // DEBUG_MODE
 
 namespace app {
-extern std::string executable_dir;
+
+class ExecutableDirectory {
+public:
+	static std::string path;
+
+private:
+	ExecutableDirectory();
+	static ExecutableDirectory instance;
+};
 } // namespace app

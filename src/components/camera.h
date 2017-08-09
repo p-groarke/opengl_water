@@ -1,14 +1,15 @@
 #pragma once
-#include "engine/component.h"
+#include "engine/entity.h"
 
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-struct Transform;
+class Transform;
 
-struct Camera {
+class Camera {
+public:
 	Camera();
 	void init(ts::Entity entity);
 	glm::mat4 get_view();

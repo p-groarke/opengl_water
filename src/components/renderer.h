@@ -1,5 +1,5 @@
 #pragma once
-#include "engine/component.h"
+#include "engine/entity.h"
 #include "engine/window.h"
 
 #include <string>
@@ -49,7 +49,8 @@ static inline void gl_error_string(char* msg)
 	}
 }
 
-struct Renderer {
+class Renderer {
+public:
 	struct Shader {
 		Shader(GLenum _type)
 			: type(_type)

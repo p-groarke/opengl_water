@@ -1,12 +1,13 @@
 #pragma once
-#include "engine/component.h"
+#include "engine/entity.h"
 
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-struct Transform {
+class Transform {
+public:
 	/* Or this could be done in update... Probly not. */
 	glm::mat4 get_model()
 	{

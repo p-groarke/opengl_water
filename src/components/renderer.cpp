@@ -39,7 +39,9 @@ void Renderer::set_shader_path(const std::string& path)
 
 void Renderer::load_shader(GLenum shader_type, const std::string& filename)
 {
-	std::string path = app::executable_dir + _relative_path + filename;
+	//	std::string path = app::executable_dir + _relative_path + filename;
+	std::string path = app::ExecutableDirectory::path + _relative_path + filename;
+
 	std::ifstream f(path, std::ios::binary | std::ios::ate);
 	if (!f.is_open()) {
 		OUTPUT_ERROR("Couldn't read shader file : %s", path.c_str());

@@ -11,29 +11,11 @@
 #include <memory>
 #include <vector>
 
-#include <unistd.h>
 static const char* project_name = "Ripples";
 Window window{ project_name };
 
-void get_executable_path(char* /*argv_0*/)
+int main()
 {
-	//	char buf[256] = {0};
-	//	getcwd(buf, 256);
-	//	std::string exec_path = { buf };
-	//	std::string path_end = { argv_0 };
-	//	if (size_t dot_slash = path_end.find("./"); dot_slash != std::string::npos) {
-	//		path_end = path_end.substr(path_end.find("./") + 1, path_end.size());
-	//		path_end = path_end.substr(0, path_end.rfind("/") + 1);
-	//	}
-	//	exec_path += path_end;
-	//	app::executable_dir = exec_path;
-}
-
-int main(int, char** argv)
-{
-	printf("Number of different components in program : %ld\n", ts::global_component_index);
-	get_executable_path(argv[0]);
-
 	ts::Entity camera_e = ts::Entity::create();
 	camera_e.add_component<RotationCamera>();
 

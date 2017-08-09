@@ -4,6 +4,7 @@
 #include "components/transform.h"
 #include "components/renderer.h"
 #include "components/camera.h"
+//#include "components/my_component.h"
 
 namespace {
 static const GLfloat quad[] = {
@@ -29,6 +30,8 @@ void Water::init(ts::Entity entity)
 	_transform = entity.add_component<Transform>();
 	_transform->rotation.x = 90.f;
 	_transform->scale = { 5.f, 5.f, 5.f };
+
+	//    entity.add_component<MyComponent>();
 
 	_renderer = entity.add_component<Renderer>();
 	_renderer->set_shader_path("shaders/");
