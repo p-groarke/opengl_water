@@ -8,10 +8,11 @@ uniform mat4 M;
 uniform float time;
 const float M_PI = 3.1415926535;
 
-float water_displacement(vec2 pos) {
-	const float freq = 0.8;
-	float d = length(pos + vec2(50, 500));
-	return (0.5 + 0.4 * sin(-M_PI * d * freq + time));
+float water_displacement(vec2 pos, vec2 offset, float amp, float freq,
+		float speed)
+{
+	float d = length(pos + offset);
+	return amp + amp * sin(M_PI * d * freq + speed * time);
 }
 
 void main() {
@@ -23,7 +24,11 @@ void main() {
 			gl_TessCoord.x);
 	vec4 local_pos = mix(p2, p1, gl_TessCoord.y);
 	fWorld_pos = M * local_pos;
-	fWorld_pos.y += water_displacement(fWorld_pos.xz);
+
+	float y_low = water_displacement(fWorld_pos.xz, vec2(-50, -100), 0.5, 0.1, 1);
+//	float y_high = water_displacement(fWorld_pos.xz, vec2(-25, -25), 0.1, 1, 4);
+//	fWorld_pos.y += y_low;// + y_high;
+
 	gl_Position = VP * fWorld_pos;
 
 	vec2 uv1 = mix(teUv[0], teUv[1], gl_TessCoord.x);

@@ -11,10 +11,10 @@ struct RotationCamera : public Component {
 	}
 
 	void update(float dt) override {
-		glm::vec3 r_axis{0.f, 1.f, 0.f};
 		glm::quat quat = glm::angleAxis(glm::radians(rotation_speed * dt)
-				, r_axis);
+				, glm::vec3{0.f, 1.f, 0.f});
 		_transform->position = quat * _transform->position;
+		_transform->look_at({0.f, 0.f, 0.f});
 	}
 
 	float rotation_speed = 2.f;

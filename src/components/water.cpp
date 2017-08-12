@@ -26,7 +26,8 @@ namespace {
 
 void Water::init() {
 	_transform = entity->add_component<Transform>();
-	_transform->rotation.x = 90.f;
+	_transform->rotation = glm::rotate(_transform->rotation,
+			glm::radians(90.f), { 1.f, 0.f, 0.f });
 	_transform->scale = { 5.f, 5.f, 5.f };
 
 	_renderer = entity->add_component<Renderer>();

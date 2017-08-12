@@ -8,24 +8,27 @@
 struct Entity {
 	Entity();
 
-//	void init();
-	void update(float dt);
-	void render(float dt);
-	void destroy();
+	template <class T> T* add_component();
+	template <class T> T* get_component();
+	template <class T> void kill_component();
+	void init_components();
+	void update_components(float dt);
+	void render_components(float dt);
+	void destroy_components();
 
-	template <class T>
-	T* add_component();
-
-	template <class T>
-	T* get_component();
-
-	template <class T>
-	void kill_component();
+	static Entity* add_entity();
+	static void kill_entity(Entity* e);
+	static void init_entities();
+	static void update_entities(float dt);
+	static void render_entities(float dt);
+	static void destroy_entities();
 
 private:
-	static size_t id_count;
 	size_t _id;
 	std::vector<std::unique_ptr<Component>> _components;
+
+	static size_t id_count;
+	static std::vector<std::unique_ptr<Entity>> _entities;
 };
 
 template <class T>

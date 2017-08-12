@@ -31,14 +31,10 @@ void get_executable_path(char* argv_0) {
 int main(int, char** argv) {
 	get_executable_path(argv[0]);
 
-	std::vector<std::unique_ptr<Entity>> entities;
-
-	entities.emplace_back(std::make_unique<Entity>());
-	Entity* camera_e = entities.back().get();
+	Entity* camera_e = Entity::add_entity();
 	camera_e->add_component<RotationCamera>();
 
-	entities.emplace_back(std::make_unique<Entity>());
-	Entity* water_e = entities.back().get();
+	Entity* water_e = Entity::add_entity();
 	water_e->add_component<Water>();
 
 	auto new_frame_t = std::chrono::high_resolution_clock::now();
@@ -52,22 +48,12 @@ int main(int, char** argv) {
 				= new_frame_t - last_frame_t;
 		const float dt = dt_duration.count();
 
-		for (const auto& x : entities) {
-			x->update(dt);
-		}
-
-		for (const auto& x : entities) {
-			x->render(dt);
-		}
+		Entity::update_entities(dt);
+		Entity::render_entities(dt);
 
 		window.post_render();
 		GL_CHECK_ERROR();
 	}
-
-	water_e->kill_component<Water>();
-
-	for (const auto& x : entities) {
-		x->destroy();
-	}
+	Entity::destroy_entities();
 	return 0;
 }

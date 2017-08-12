@@ -4,6 +4,8 @@
 #include "engine/window.h"
 #include "components/transform.h"
 
+#include <glm/gtc/matrix_inverse.hpp>
+
 Camera::Camera() {
 	if (Camera::main == nullptr)
 		Camera::main = this;
@@ -14,8 +16,7 @@ void Camera::init() {
 }
 
 glm::mat4 Camera::get_view() {
-	return glm::lookAt(_transform->position, glm::vec3(0.f, 0.f, 0.f)
-			, glm::vec3(0.f, 1.f, 0.f));
+	return glm::affineInverse(_transform->get_model());
 }
 
 glm::mat4 Camera::get_projection() {

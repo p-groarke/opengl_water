@@ -35,10 +35,10 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 # target_compile_definitions(${PROJECT_NAME} PUBLIC _HAS_EXCEPTIONS=0
-# 	_STATIC_CPPLIB=1 ENABLE_PROFILING=0)
+#	_STATIC_CPPLIB=1 ENABLE_PROFILING=0)
 
 # set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY
-# 	VS_STARTUP_PROJECT ${PROJECT_NAME})
+#	VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra #-Wpedantic
@@ -134,7 +134,8 @@ ExternalProject_Add(glfw3_ext
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw3)
 
-set_target_properties(glad_ext glfw3_ext glm_ext PROPERTIES FOLDER ${DEPENDENCY_FOLDER})
+set_target_properties(glad_ext glfw3_ext glm_ext PROPERTIES
+		FOLDER ${DEPENDENCY_FOLDER})
 add_dependencies(${PROJECT_NAME} glad_ext glfw3_ext glm_ext)
 
 ##
@@ -155,7 +156,8 @@ foreach(SHADER ${SHADERS})
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${STAMP_DIR}
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${SHADER_OUT_DIR}
 		COMMAND ${CMAKE_COMMAND} -E touch ${STAMP_FILE}
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SHADER} ${SHADER_OUT_DIR}/${SHADER_FILENAME} #$<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders/${SHADER_FILENAME}
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SHADER}
+				${SHADER_OUT_DIR}/${SHADER_FILENAME}
 		DEPENDS ${SHADER}
 	)
 	list(APPEND STAMP_FILES ${STAMP_FILE})
