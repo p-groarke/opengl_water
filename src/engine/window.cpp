@@ -24,7 +24,7 @@ Window::Window(const char* window_name) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, samples);
+//	glfwWindowHint(GLFW_SAMPLES, samples);
 	if (!(window = glfwCreateWindow(width, height, window_name, nullptr
 			, nullptr)))
 	{
@@ -36,12 +36,12 @@ Window::Window(const char* window_name) {
 	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
 	glfwSwapInterval(swap_interval);
 
-	glGetIntegerv(GL_SAMPLES, &samples);
-	if (samples) {
-		printf("MSAA enabled with %d samples\n", samples);
-	} else {
-		printf("MSAA is not be available\n");
-	}
+//	glGetIntegerv(GL_SAMPLES, &samples);
+//	if (samples) {
+//		printf("MSAA enabled with %d samples\n", samples);
+//	} else {
+//		printf("MSAA is not be available\n");
+//	}
 	glfwSetWindowUserPointer(window, this);
 
 	/* Callbacks */

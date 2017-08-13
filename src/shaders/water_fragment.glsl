@@ -10,7 +10,8 @@ void main() {
 //	float disp = texture(water_disp, fUv).r;
 //	vec4 c = mix(dark_base_color, light_base_color, pow(disp, 2.0));
 
-	float percentage = clamp(fWorld_pos.y, 0, 1);
-	vec4 c = mix(dark_base_color, light_base_color, pow(percentage, 2.0));
+	float percentage = fWorld_pos.y + 1;
+	percentage = clamp(percentage, 0, 1);
+	vec4 c = mix(dark_base_color, light_base_color, percentage);
 	color = c;
 }

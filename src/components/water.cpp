@@ -7,10 +7,10 @@
 
 namespace {
 	static const GLfloat quad[] = {
-		-1.f, -1.f, 0.0f, // Bottom-left
-		1.f, -1.f, 0.0f, // Bottom-right
-		-1.f, 1.f, 0.0f, // Top-left
-		1.f, 1.f, 0.0f // Top-right
+		-0.5f, -0.5f, 0.0f, // Bottom-left
+		0.5f, -0.5f, 0.0f, // Bottom-right
+		-0.5f, 0.5f, 0.0f, // Top-left
+		0.5f, 0.5f, 0.0f // Top-right
 	//	-0.5f, 0.5f, 0.0f,
 	//	0.5f, -0.5f, 0.0f,
 	//	0.5f, 0.5f, 0.0f
@@ -22,13 +22,42 @@ namespace {
 		0.0, 1.0, // Top-left.
 		1.0, 1.0 // Top-right.
 	};
+
+	void init_big_quad(std::vector<GLfloat>& quads, int count) {
+		int offset_y = -(count / 2);
+		for (int y = 0; y < count; ++y) {
+			offset_y += 1;
+			int offset_x = -(count / 2);
+			for (int x = 0; x < count; ++x) {
+				offset_x += 1;
+				quads.push_back(quad[0] + offset_x);
+				quads.push_back(quad[1] + offset_y);
+				quads.push_back(quad[2]);
+				quads.push_back(quad[3] + offset_x);
+				quads.push_back(quad[4] + offset_y);
+				quads.push_back(quad[5]);
+				quads.push_back(quad[6] + offset_x);
+				quads.push_back(quad[7] + offset_y);
+				quads.push_back(quad[8]);
+				quads.push_back(quad[9] + offset_x);
+				quads.push_back(quad[10] + offset_y);
+				quads.push_back(quad[11]);
+			}
+		}
+	}
 }
 
 void Water::init() {
+	int num_quads = 2;
+	_quads.reserve(num_quads * num_quads);
+	init_big_quad(_quads, num_quads);
+
 	_transform = entity->add_component<Transform>();
 	_transform->rotation = glm::rotate(_transform->rotation,
 			glm::radians(90.f), { 1.f, 0.f, 0.f });
-	_transform->scale = { 5.f, 5.f, 5.f };
+//	_transform->scale = { 5.f, 5.f, 5.f };
+//	_transform->scale = { 2.f, 2.f, 2.f };
+	_transform->scale = { 3.f, 3.f, 3.f };
 
 	_renderer = entity->add_component<Renderer>();
 	_renderer->set_shader_path("shaders/");
@@ -52,7 +81,9 @@ void Water::init() {
 
 	glGenBuffers(1, &vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * _quads.size(), _quads.data()
+			, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(vpos_location);
 	glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
@@ -100,7 +131,7 @@ void Water::render(float) {
 	glUniform1f(time_loc, glfwGetTime());
 
 	glBindVertexArray(vertex_array);
-	glDrawArrays(GL_PATCHES, 0, 4);
+	glDrawArrays(GL_PATCHES, 0, _quads.size() / 3);
 	glBindVertexArray(0);
 }
 

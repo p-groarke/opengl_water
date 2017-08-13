@@ -1,6 +1,8 @@
 #pragma once
 #include "engine/component.h"
 
+#include <vector>
+
 struct Transform;
 struct Renderer;
 
@@ -17,4 +19,6 @@ private:
 	GLuint vertex_array, vertex_buffer, uv_buffer;
 	GLint vp_location, vpos_location, model_location, vuv_location
 			, time_loc;
+
+	std::vector<GLfloat> _quads;
 };

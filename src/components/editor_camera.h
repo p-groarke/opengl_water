@@ -80,7 +80,7 @@ private:
 		glm::dvec2 mouse_pos{ x, y };
 		glm::dvec2 mouse_delta = mouse_pos - _last_mouse_pos;
 
-		if (_left_click && !_right_click) {
+		if (_left_click) {
 			glm::quat horiz = glm::angleAxis(
 					glm::radians(-(float)mouse_delta.x * _last_dt * mouse_speed),
 					glm::vec3{0.f, 1.f, 0.f});
