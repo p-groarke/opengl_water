@@ -106,11 +106,18 @@ private:
 			_transform->rotation = vert * _transform->rotation;
 		}
 
+		if (_middle_click) {
+			_transform->position += _transform->right() * _last_dt
+					* -mouse_delta.x;
+			_transform->position += _transform->up() * _last_dt
+					* mouse_delta.y;
+		}
+
 		_last_mouse_pos = mouse_pos;
 	}
 
 	void on_mouse_scroll(double, double y) {
-		if (_left_click == !_right_click) {
+		if (!_right_click) {
 			_transform->position += _transform->forward() * _last_dt
 					* move_speed * y;
 		}
@@ -123,10 +130,10 @@ private:
 	void on_mouse_click(int button, int action, int) {
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
 			if (action == GLFW_PRESS) {
-				glfwSetInputMode(Window::main->window, GLFW_CURSOR,
-						GLFW_CURSOR_DISABLED);
 				glfwGetCursorPos(Window::main->window, &_last_mouse_pos.x,
 						&_last_mouse_pos.y);
+				glfwSetInputMode(Window::main->window, GLFW_CURSOR,
+						GLFW_CURSOR_HIDDEN);
 				_left_click = true;
 			} else if (action == GLFW_RELEASE) {
 				glfwSetInputMode(Window::main->window, GLFW_CURSOR,
@@ -137,15 +144,29 @@ private:
 
 		if (button == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (action == GLFW_PRESS) {
-				glfwSetInputMode(Window::main->window, GLFW_CURSOR,
-						GLFW_CURSOR_DISABLED);
 				glfwGetCursorPos(Window::main->window, &_last_mouse_pos.x,
 						&_last_mouse_pos.y);
+				glfwSetInputMode(Window::main->window, GLFW_CURSOR,
+						GLFW_CURSOR_HIDDEN);
 				_right_click = true;
 			} else if (action == GLFW_RELEASE) {
 				glfwSetInputMode(Window::main->window, GLFW_CURSOR,
 						GLFW_CURSOR_NORMAL);
 				_right_click = false;
+			}
+		}
+
+		if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+			if (action == GLFW_PRESS) {
+				glfwGetCursorPos(Window::main->window, &_last_mouse_pos.x,
+						&_last_mouse_pos.y);
+				glfwSetInputMode(Window::main->window, GLFW_CURSOR,
+						GLFW_CURSOR_HIDDEN);
+				_middle_click = true;
+			} else if (action == GLFW_RELEASE) {
+				glfwSetInputMode(Window::main->window, GLFW_CURSOR,
+						GLFW_CURSOR_NORMAL);
+				_middle_click = false;
 			}
 		}
 	}
@@ -160,6 +181,7 @@ private:
 
 	bool _left_click = false;
 	bool _right_click = false;
+	bool _middle_click = false;
 	float _last_dt = 0.f;
 	glm::dvec2 _last_mouse_pos = { 0.f, 0.f };
 };
