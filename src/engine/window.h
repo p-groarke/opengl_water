@@ -11,10 +11,10 @@ struct Window {
 
 	void post_render();
 
-	static void on_key(std::function<void(int, int, int, int)> callback);
-	static void on_mouse_pos(std::function<void(double, double)> callback);
-	static void on_mouse_button(std::function<void(int, int, int)> callback);
-	static void on_scroll(std::function<void(double, double)> callback);
+	void set_on_key(const std::function<void(int, int, int, int)>& callback);
+	void set_on_mouse_pos(const std::function<void(double, double)>& callback);
+	void set_on_mouse_button(const std::function<void(int, int, int)>& callback);
+	void set_on_mouse_scroll(const std::function<void(double, double)>& callback);
 
 	/* GLFW callbacks. */
 private:
@@ -41,8 +41,8 @@ public:
 	static Window* main;
 
 private:
-	static std::vector<std::function<void(int, int, int, int)>> key_user_callbacks;
-	static std::vector<std::function<void(double, double)>> mouse_pos_user_callbacks;
-	static std::vector<std::function<void(int, int, int)>> mouse_butt_user_callbacks;
-	static std::vector<std::function<void(double, double)>> scroll_user_callbacks;
+	std::vector<std::function<void(int, int, int, int)>> key_user_callbacks;
+	std::vector<std::function<void(double, double)>> mouse_pos_user_callbacks;
+	std::vector<std::function<void(int, int, int)>> mouse_butt_user_callbacks;
+	std::vector<std::function<void(double, double)>> mouse_scroll_user_callbacks;
 };

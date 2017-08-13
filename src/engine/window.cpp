@@ -63,20 +63,20 @@ void Window::post_render() {
 	glfwPollEvents();
 }
 
-void Window::on_key(std::function<void(int, int, int, int)> callback) {
+void Window::set_on_key(const std::function<void(int, int, int, int)>& callback) {
 	key_user_callbacks.emplace_back(callback);
 }
 
-void Window::on_mouse_pos(std::function<void(double, double)> callback) {
+void Window::set_on_mouse_pos(const std::function<void(double, double)>& callback) {
 	mouse_pos_user_callbacks.emplace_back(callback);
 }
 
-void Window::on_mouse_button(std::function<void(int, int, int)> callback) {
+void Window::set_on_mouse_button(const std::function<void(int, int, int)>& callback) {
 	mouse_butt_user_callbacks.emplace_back(callback);
 }
 
-void Window::on_scroll(std::function<void(double, double)> callback) {
-	scroll_user_callbacks.emplace_back(callback);
+void Window::set_on_mouse_scroll(const std::function<void(double, double)>& callback) {
+	mouse_scroll_user_callbacks.emplace_back(callback);
 }
 
 /* glfw callbacks. */
@@ -99,44 +99,35 @@ void Window::key_callback(GLFWwindow* window_, int key, int scancode
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window_, GLFW_TRUE);
 
-	for (const auto& x : key_user_callbacks) {
-		x(key, scancode, action, mods);
+	auto w = get_this(window_);
+	for (size_t i = 0; i < w->key_user_callbacks.size(); ++i) {
+		w->key_user_callbacks[i](key, scancode, action, mods);
 	}
 }
 
-void Window::mouse_pos_callback(GLFWwindow*, double xpos, double ypos)
+void Window::mouse_pos_callback(GLFWwindow* window_, double xpos, double ypos)
 {
-	for (const auto& x : mouse_pos_user_callbacks) {
-		x(xpos, ypos);
+	auto w = get_this(window_);
+	for (size_t i = 0; i < w->mouse_pos_user_callbacks.size(); ++i) {
+		w->mouse_pos_user_callbacks[i](xpos, ypos);
 	}
 }
 
 void Window::mouse_butt_callback(GLFWwindow* window_, int button
 		, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (action == GLFW_PRESS) {
-			glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-//			glfwGetCursorPos(window_, &cursorX, &cursorY);
-		} else {
-			glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		}
-	}
-
-	for (const auto& x : mouse_butt_user_callbacks) {
-		x(button, action, mods);
+	auto w = get_this(window_);
+	for (size_t i = 0; i < w->mouse_butt_user_callbacks.size(); ++i) {
+		w->mouse_butt_user_callbacks[i](button, action, mods);
 	}
 }
 
-void Window::scroll_callback(GLFWwindow*, double xoffset, double yoffset)
+void Window::scroll_callback(GLFWwindow* window_, double xoffset, double yoffset)
 {
-	for (const auto& x : scroll_user_callbacks) {
-		x(xoffset, yoffset);
+	auto w = get_this(window_);
+	for (size_t i = 0; i < w->mouse_scroll_user_callbacks.size(); ++i) {
+		w->mouse_scroll_user_callbacks[i](xoffset, yoffset);
 	}
 }
 
 Window* Window::main = nullptr;
-std::vector<std::function<void(int, int, int, int)>> Window::key_user_callbacks = {};
-std::vector<std::function<void(double, double)>> Window::mouse_pos_user_callbacks = {};
-std::vector<std::function<void(int, int, int)>> Window::mouse_butt_user_callbacks = {};
-std::vector<std::function<void(double, double)>> Window::scroll_user_callbacks = {};

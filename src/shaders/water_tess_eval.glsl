@@ -27,7 +27,7 @@ void main() {
 
 	float y_low = water_displacement(fWorld_pos.xz, vec2(-50, -100), 0.5, 0.1, 1);
 //	float y_high = water_displacement(fWorld_pos.xz, vec2(-25, -25), 0.1, 1, 4);
-//	fWorld_pos.y += y_low;// + y_high;
+	fWorld_pos.y += y_low;// + y_high;
 
 	gl_Position = VP * fWorld_pos;
 

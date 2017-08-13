@@ -3,6 +3,7 @@
 #include "engine/entity.h"
 #include "components/camera.h"
 #include "components/rotation_camera.h"
+#include "components/editor_camera.h"
 #include "components/water.h"
 #include "components/renderer.h"
 
@@ -32,7 +33,8 @@ int main(int, char** argv) {
 	get_executable_path(argv[0]);
 
 	Entity* camera_e = Entity::add_entity();
-	camera_e->add_component<RotationCamera>();
+//	camera_e->add_component<RotationCamera>();
+	camera_e->add_component<EditorCamera>();
 
 	Entity* water_e = Entity::add_entity();
 	water_e->add_component<Water>();
