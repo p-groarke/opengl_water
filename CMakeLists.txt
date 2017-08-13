@@ -95,8 +95,8 @@ endforeach()
 ##
 # External dependencies.
 ##
-target_include_directories(${PROJECT_NAME} PRIVATE
-	${CMAKE_CURRENT_BINARY_DIR}/include)
+set(LIB_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${LIB_INCLUDE_DIR})
 
 ExternalProject_Add(glad_ext
 	GIT_REPOSITORY https://github.com/Dav1dde/glad.git
@@ -134,9 +134,28 @@ ExternalProject_Add(glfw3_ext
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw3)
 
-set_target_properties(glad_ext glfw3_ext glm_ext PROPERTIES
+ExternalProject_Add(stb_ext
+	GIT_REPOSITORY https://github.com/nothings/stb.git
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND
+		COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>
+				${LIB_INCLUDE_DIR}/stb
+		COMMAND ${CMAKE_COMMAND} -E remove_directory ${LIB_INCLUDE_DIR}/stb/.git
+		COMMAND ${CMAKE_COMMAND} -E remove_directory ${LIB_INCLUDE_DIR}/stb/.github
+		COMMAND ${CMAKE_COMMAND} -E remove_directory ${LIB_INCLUDE_DIR}/stb/data
+		COMMAND ${CMAKE_COMMAND} -E remove_directory
+				${LIB_INCLUDE_DIR}/stb/deprecated
+		COMMAND ${CMAKE_COMMAND} -E remove_directory ${LIB_INCLUDE_DIR}/stb/docs
+		COMMAND ${CMAKE_COMMAND} -E remove_directory ${LIB_INCLUDE_DIR}/stb/tests
+		COMMAND ${CMAKE_COMMAND} -E remove_directory ${LIB_INCLUDE_DIR}/stb/tools
+		COMMAND ${CMAKE_COMMAND} -E remove ${LIB_INCLUDE_DIR}/stb/.travis.yml
+		COMMAND ${CMAKE_COMMAND} -E remove ${LIB_INCLUDE_DIR}/stb/README.md
+	INSTALL_COMMAND ""
+	UPDATE_COMMAND ""
+)
+set_target_properties(glad_ext glfw3_ext glm_ext stb_ext PROPERTIES
 		FOLDER ${DEPENDENCY_FOLDER})
-add_dependencies(${PROJECT_NAME} glad_ext glfw3_ext glm_ext)
+add_dependencies(${PROJECT_NAME} glad_ext glfw3_ext glm_ext stb_ext)
 
 ##
 # Copy shaders on build.
