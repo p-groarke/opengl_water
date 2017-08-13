@@ -12,5 +12,7 @@
 	printf("" format "\n", ##__VA_ARGS__)
 
 namespace app {
-extern std::string executable_dir;
+extern std::string path;
+
+void init_executable_path();
 } // namespace app
