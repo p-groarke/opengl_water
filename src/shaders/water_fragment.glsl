@@ -11,7 +11,7 @@ void main() {
 //	vec4 c = mix(dark_base_color, light_base_color, pow(disp, 2.0));
 
 	float percentage = fWorld_pos.y + 1;
-	percentage = clamp(percentage, 0, 1);
+	percentage = clamp(percentage / 3, 0, 1);
 	vec4 c = mix(dark_base_color, light_base_color, percentage);
 	color = c;
 }

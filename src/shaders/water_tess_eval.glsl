@@ -20,7 +20,7 @@ float Q(float steepness, float w, float A) {
 	return steepness / (w * A);
 }
 
-
+// Phi = speed * frequency(w)
 float Phi(float speed, float w) {
 	return speed * w;
 }
@@ -40,36 +40,50 @@ struct Wave {
 	float phi;			// Phi = speed * w
 };
 
-const uint num_waves = 4;
-const WaveConstants wave_constants[num_waves] = WaveConstants[](
-	WaveConstants(0.6, 1, normalize(vec2(0, 1)), 2, 1)
-	, WaveConstants(0.7, 0.1, normalize(vec2(-1, -2)), 0.5, 1)
-	, WaveConstants(0.2, 0.8, normalize(vec2(1, 1)), 5, 0.2)
-	, WaveConstants(0.3, 1, normalize(vec2(1, -3)), 10, 0.1)
+const WaveConstants wave_constants[] = WaveConstants[](
+	WaveConstants(0.4, 0.5, normalize(vec2(1, 0)), 2, 1)
+	, WaveConstants(0, 0.01, normalize(vec2(1, 0.3)), 0.2, 0.1)
+	, WaveConstants(0.2, 0.2, normalize(vec2(-1, 1)), 5, 2)
+	, WaveConstants(0.01, 1, normalize(vec2(1, -3)), 50, 25)
+	, WaveConstants(0.6, 0.3, normalize(vec2(0, 5)), 10, 0.8)
 );
 
 // As long as it works and is fast...
-Wave waves[num_waves] = Wave[](
+Wave waves[] = Wave[](
 	Wave(
 		wave_constants[0]
 		, w(wave_constants[0].L)
-		, Q(wave_constants[0].steepness, w(wave_constants[0].L), wave_constants[0].A)
+		, Q(wave_constants[0].steepness, w(wave_constants[0].L),
+				wave_constants[0].A)
 		, Phi(wave_constants[0].speed, w(wave_constants[0].L))
-	), Wave(
+	)
+	, Wave(
 		wave_constants[1]
 		, w(wave_constants[1].L)
-		, Q(wave_constants[1].steepness, w(wave_constants[1].L), wave_constants[1].A)
+		, Q(wave_constants[1].steepness, w(wave_constants[1].L),
+				wave_constants[1].A)
 		, Phi(wave_constants[1].speed, w(wave_constants[1].L))
-	), Wave(
+	)
+	, Wave(
 		wave_constants[2]
 		, w(wave_constants[2].L)
-		, Q(wave_constants[2].steepness, w(wave_constants[2].L), wave_constants[2].A)
+		, Q(wave_constants[2].steepness, w(wave_constants[2].L),
+				wave_constants[2].A)
 		, Phi(wave_constants[2].speed, w(wave_constants[2].L))
-	), Wave(
+	)
+	, Wave(
 		wave_constants[3]
 		, w(wave_constants[3].L)
-		, Q(wave_constants[3].steepness, w(wave_constants[3].L), wave_constants[3].A)
+		, Q(wave_constants[3].steepness, w(wave_constants[3].L),
+				wave_constants[3].A)
 		, Phi(wave_constants[3].speed, w(wave_constants[3].L))
+	)
+	, Wave(
+		wave_constants[4]
+		, w(wave_constants[4].L)
+		, Q(wave_constants[4].steepness, w(wave_constants[4].L),
+				wave_constants[4].A)
+		, Phi(wave_constants[4].speed, w(wave_constants[4].L))
 	)
 );
 

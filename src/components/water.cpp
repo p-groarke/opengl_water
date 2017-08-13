@@ -71,8 +71,8 @@ void Water::init() {
 	_transform->rotation = glm::rotate(_transform->rotation,
 			glm::radians(90.f), { 1.f, 0.f, 0.f });
 //	_transform->scale = { 5.f, 5.f, 5.f };
-//	_transform->scale = { 2.f, 2.f, 2.f };
-	_transform->scale = { 3.f, 3.f, 3.f };
+	_transform->scale = { 2.f, 2.f, 2.f };
+//	_transform->scale = { 3.f, 3.f, 3.f };
 
 	_renderer = entity->add_component<Renderer>();
 	_renderer->set_shader_path("shaders/");
