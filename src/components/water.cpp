@@ -23,34 +23,49 @@ namespace {
 		1.0, 1.0 // Top-right.
 	};
 
-	void init_big_quad(std::vector<GLfloat>& quads, int count) {
+//	void init_big_quad(std::vector<GLfloat>& quads, int count) {
+//		int offset_y = -(count / 2);
+//		for (int y = 0; y < count; ++y) {
+//			offset_y += 1;
+//			int offset_x = -(count / 2);
+//			for (int x = 0; x < count; ++x) {
+//				offset_x += 1;
+//				quads.push_back(quad[0] + offset_x);
+//				quads.push_back(quad[1] + offset_y);
+//				quads.push_back(quad[2]);
+//				quads.push_back(quad[3] + offset_x);
+//				quads.push_back(quad[4] + offset_y);
+//				quads.push_back(quad[5]);
+//				quads.push_back(quad[6] + offset_x);
+//				quads.push_back(quad[7] + offset_y);
+//				quads.push_back(quad[8]);
+//				quads.push_back(quad[9] + offset_x);
+//				quads.push_back(quad[10] + offset_y);
+//				quads.push_back(quad[11]);
+//			}
+//		}
+//	}
+
+	void gen_positions(std::vector<glm::vec3>& positions, int count) {
 		int offset_y = -(count / 2);
 		for (int y = 0; y < count; ++y) {
 			offset_y += 1;
 			int offset_x = -(count / 2);
 			for (int x = 0; x < count; ++x) {
 				offset_x += 1;
-				quads.push_back(quad[0] + offset_x);
-				quads.push_back(quad[1] + offset_y);
-				quads.push_back(quad[2]);
-				quads.push_back(quad[3] + offset_x);
-				quads.push_back(quad[4] + offset_y);
-				quads.push_back(quad[5]);
-				quads.push_back(quad[6] + offset_x);
-				quads.push_back(quad[7] + offset_y);
-				quads.push_back(quad[8]);
-				quads.push_back(quad[9] + offset_x);
-				quads.push_back(quad[10] + offset_y);
-				quads.push_back(quad[11]);
+				positions.emplace_back(glm::vec3{offset_x, offset_y, 0.f});
 			}
 		}
 	}
 }
 
 void Water::init() {
-	int num_quads = 2;
-	_quads.reserve(num_quads * num_quads);
-	init_big_quad(_quads, num_quads);
+	int num_quads = 100;
+//	_quads.reserve(num_quads * num_quads);
+//	init_big_quad(_quads, num_quads);
+
+	_instance_transforms.reserve(num_quads * num_quads);
+	gen_positions(_instance_transforms, num_quads);
 
 	_transform = entity->add_component<Transform>();
 	_transform->rotation = glm::rotate(_transform->rotation,
@@ -68,36 +83,51 @@ void Water::init() {
 	_renderer->create();
 
 	auto& program = _renderer->program;
-	vp_location = glGetUniformLocation(program, "VP");
-	model_location = glGetUniformLocation(program, "M");
+	vp_loc = glGetUniformLocation(program, "VP");
+	model_loc = glGetUniformLocation(program, "M");
 	time_loc = glGetUniformLocation(program, "time");
 
-	vpos_location = glGetAttribLocation(program, "vPos");
-//		vcol_location = glGetAttribLocation(program, "vCol");
-	vuv_location = glGetAttribLocation(program, "vUv");
+	vpos_loc = glGetAttribLocation(program, "vPos");
+//		vcol_loc = glGetAttribLocation(program, "vCol");
+	vuv_loc = glGetAttribLocation(program, "vUv");
+	transform_loc = glGetAttribLocation(program, "vTransform");
 
 	glGenVertexArrays(1, &vertex_array);
 	glBindVertexArray(vertex_array);
 
+	/* Vertex quad */
 	glGenBuffers(1, &vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-//	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * _quads.size(), _quads.data()
-			, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
+//	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * _quads.size(), _quads.data()
+//			, GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(vpos_location);
-	glVertexAttribPointer(vpos_location, 3, GL_FLOAT, GL_FALSE,
+	glEnableVertexAttribArray(vpos_loc);
+	glVertexAttribPointer(vpos_loc, 3, GL_FLOAT, GL_FALSE,
 			0, (void*)0);
 
-//		glEnableVertexAttribArray(vcol_location);
-//		glVertexAttribPointer(vcol_location, 4, GL_FLOAT, GL_FALSE,
+	/* Transforms */
+	glGenBuffers(1, &transform_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, transform_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * _instance_transforms.size(),
+			_instance_transforms.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(transform_loc);
+	glVertexAttribPointer(transform_loc, 3, GL_FLOAT, GL_FALSE,
+			0, (void*)0);
+	glVertexAttribDivisor(transform_loc, 1);
+
+
+//		glEnableVertexAttribArray(vcol_loc);
+//		glVertexAttribPointer(vcol_loc, 4, GL_FLOAT, GL_FALSE,
 //				0, (void*) (sizeof(float) * 3));
 
+	/* UVs */
 	glGenBuffers(1, &uv_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(tex_coords), tex_coords, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(vuv_location);
-	glVertexAttribPointer(vuv_location, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glEnableVertexAttribArray(vuv_loc);
+	glVertexAttribPointer(vuv_loc, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	glBindVertexArray(0);
 	GL_CHECK_ERROR();
@@ -124,14 +154,15 @@ void Water::render(float) {
 
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	glUniformMatrix4fv(vp_location, 1, GL_FALSE,
+	glUniformMatrix4fv(vp_loc, 1, GL_FALSE,
 			&Camera::main->get_view_projection()[0][0]);
-	glUniformMatrix4fv(model_location, 1, GL_FALSE,
+	glUniformMatrix4fv(model_loc, 1, GL_FALSE,
 			&_transform->get_model()[0][0]);
 	glUniform1f(time_loc, glfwGetTime());
 
 	glBindVertexArray(vertex_array);
-	glDrawArrays(GL_PATCHES, 0, _quads.size() / 3);
+//	glDrawArrays(GL_PATCHES, 0, _quads.size() / 3);
+	glDrawArraysInstanced(GL_PATCHES, 0, 4, _instance_transforms.size());
 	glBindVertexArray(0);
 }
 

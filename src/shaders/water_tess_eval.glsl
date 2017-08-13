@@ -9,63 +9,86 @@ uniform mat4 M;
 uniform float time;
 
 const float M_PI = 3.1415926535;
-const float steepness = 0.6; // Q : 0 to 1
 
-struct wave {
-	float amplitude;	// A
-	vec2 direction;		// D
-	float wavelength;	// L
-	float speed;		// Phi
-};
 // w = frequency = 2/L
-// Qi = actual steepness = Q / w * A
-
-const wave waves[2] = wave[](
-	wave(1, vec2(0, 1), 2, 1)
-	, wave(0.1, vec2(-1, -2), 0.5, 1)
-//	, wave(0.3, vec2(1, 3), 0.2, 0.5)
-);
-
-float phase(float speed, float wavelength, float time) {
-	return speed * (2 / wavelength) * time;
+float w(float L) {
+	return 2 / L;
 }
 
-float w(float wavelength) {
-	return 2 / wavelength;
-}
-
-float Q(float w, float A) {
+// Qi = actual steepness = Q / w * A (* i)?
+float Q(float steepness, float w, float A) {
 	return steepness / (w * A);
 }
+
+
+float Phi(float speed, float w) {
+	return speed * w;
+}
+
+struct WaveConstants {
+	float steepness;	// Q : 0 to 1
+	float A;			// Amplitude
+	vec2 D;				// Direction : normalized
+	float L;			// wavelength
+	float speed;		// Phi
+};
+
+struct Wave {
+	WaveConstants constants;
+	float w;			// w = frequency = 2 / L
+	float Q;			// Qi = actual steepness = Q / w * A (* i)?
+	float phi;			// Phi = speed * w
+};
+
+const uint num_waves = 4;
+const WaveConstants wave_constants[num_waves] = WaveConstants[](
+	WaveConstants(0.6, 1, normalize(vec2(0, 1)), 2, 1)
+	, WaveConstants(0.7, 0.1, normalize(vec2(-1, -2)), 0.5, 1)
+	, WaveConstants(0.2, 0.8, normalize(vec2(1, 1)), 5, 0.2)
+	, WaveConstants(0.3, 1, normalize(vec2(1, -3)), 10, 0.1)
+);
+
+// As long as it works and is fast...
+Wave waves[num_waves] = Wave[](
+	Wave(
+		wave_constants[0]
+		, w(wave_constants[0].L)
+		, Q(wave_constants[0].steepness, w(wave_constants[0].L), wave_constants[0].A)
+		, Phi(wave_constants[0].speed, w(wave_constants[0].L))
+	), Wave(
+		wave_constants[1]
+		, w(wave_constants[1].L)
+		, Q(wave_constants[1].steepness, w(wave_constants[1].L), wave_constants[1].A)
+		, Phi(wave_constants[1].speed, w(wave_constants[1].L))
+	), Wave(
+		wave_constants[2]
+		, w(wave_constants[2].L)
+		, Q(wave_constants[2].steepness, w(wave_constants[2].L), wave_constants[2].A)
+		, Phi(wave_constants[2].speed, w(wave_constants[2].L))
+	), Wave(
+		wave_constants[3]
+		, w(wave_constants[3].L)
+		, Q(wave_constants[3].steepness, w(wave_constants[3].L), wave_constants[3].A)
+		, Phi(wave_constants[3].speed, w(wave_constants[3].L))
+	)
+);
 
 vec3 gerstner_wave(vec2 pos, float time) {
 	float x = pos.x;
 	for (int i = 0; i < waves.length(); ++i) {
-		vec2 dir = normalize(waves[i].direction);
-		float w = w(waves[i].wavelength);
-		float Qi = Q(w, waves[i].amplitude);
-		float phi_t = phase(waves[i].speed, waves[i].wavelength, time);
-		x += Qi * waves[i].amplitude * dir.x
-				* cos(w * dot(dir, pos) + phi_t);
+		x += waves[i].Q * waves[i].constants.A * waves[i].constants.D.x
+				* cos(waves[i].w * dot(waves[i].constants.D, pos) + waves[i].phi * time);
 	}
 
 	float z = pos.y;
 	for (int i = 0; i < waves.length(); ++i) {
-		vec2 dir = normalize(waves[i].direction);
-		float w = w(waves[i].wavelength);
-		float Qi = Q(w, waves[i].amplitude);
-		float phi_t = phase(waves[i].speed, waves[i].wavelength, time);
-		z += Qi * waves[i].amplitude * dir.y
-				* cos(w * dot(dir, pos) + phi_t);
+		z += waves[i].Q * waves[i].constants.A * waves[i].constants.D.y
+				* cos(waves[i].w * dot(waves[i].constants.D, pos) + waves[i].phi * time);
 	}
 
 	float y = 0;
 	for (int i = 0; i < waves.length(); ++i) {
-		vec2 dir = normalize(waves[i].direction);
-		float w = w(waves[i].wavelength);
-		float Qi = Q(w, waves[i].amplitude);
-		float phi_t = phase(waves[i].speed, waves[i].wavelength, time);
-		y += waves[i].amplitude * sin(w * dot(dir, pos) + phi_t);
+		y += waves[i].constants.A * sin(waves[i].w * dot(waves[i].constants.D, pos) + waves[i].phi * time);
 	}
 
 	return vec3(x, y, z);

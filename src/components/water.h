@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/component.h"
 
+#include <glm/vec3.hpp>
 #include <vector>
 
 struct Transform;
@@ -16,9 +17,8 @@ private:
 	Transform* _transform;
 	Renderer* _renderer;
 
-	GLuint vertex_array, vertex_buffer, uv_buffer;
-	GLint vp_location, vpos_location, model_location, vuv_location
-			, time_loc;
+	GLuint vertex_array, vertex_buffer, uv_buffer, transform_buffer;
+	GLint vp_loc, vpos_loc, model_loc, vuv_loc, time_loc, transform_loc;
 
-	std::vector<GLfloat> _quads;
+	std::vector<glm::vec3> _instance_transforms;
 };
