@@ -44,14 +44,18 @@ struct Wave {
 };
 
 const WaveConstants wave_constants[] = WaveConstants[](
-	  WaveConstants(0.9, 0.1, normalize(vec2(1, 0)), 1, 1)
-	, WaveConstants(0.9, 0.2, normalize(vec2(1, 0)), 2, 2)
-	, WaveConstants(0.9, 0.4, normalize(vec2(1, 0)), 4, 4)
-	, WaveConstants(0.9, 0.8, normalize(vec2(1, 0)), 8, 8)
-	, WaveConstants(0.6, 0.05, normalize(vec2(1, 1)), 1, 1)
-	, WaveConstants(0.6, 0.1, normalize(vec2(1, 1)), 2, 2)
-	, WaveConstants(0.6, 0.2, normalize(vec2(1, 1)), 4, 4)
-	, WaveConstants(0.6, 0.4, normalize(vec2(1, 1)), 8, 8)
+	  WaveConstants(1, 0.1, normalize(vec2(1, 0)), 1, 1)
+	, WaveConstants(1, 0.2, normalize(vec2(1, 0)), 2, 2)
+	, WaveConstants(1, 0.4, normalize(vec2(1, 0)), 4, 4)
+	, WaveConstants(1, 0.8, normalize(vec2(1, 0)), 8, 8)
+	, WaveConstants(1, 1.6, normalize(vec2(1, 0)), 16, 16)
+	, WaveConstants(1, 3.2, normalize(vec2(1, 0)), 32, 32)
+	, WaveConstants(0.7, 0.05, normalize(vec2(1, 1)), 1, 1)
+	, WaveConstants(0.7, 0.1, normalize(vec2(1, 1)), 2, 2)
+	, WaveConstants(0.7, 0.2, normalize(vec2(1, 1)), 4, 4)
+	, WaveConstants(0.7, 0.4, normalize(vec2(1, 1)), 8, 8)
+	, WaveConstants(0.7, 0.8, normalize(vec2(1, 1)), 16, 16)
+	, WaveConstants(0.7, 1.6, normalize(vec2(1, 1)), 32, 32)
 	//WaveConstants(0.8, 0.3, normalize(vec2(1, 0)), 3, 7)
 	//, WaveConstants(0.5, 0.1, normalize(vec2(1, 0.2)), 1, 3)
 	//, WaveConstants(0.8, 0.2, normalize(vec2(1, -0.3)), 5, 5)
@@ -64,64 +68,38 @@ const WaveConstants wave_constants[] = WaveConstants[](
 const uint num_waves = wave_constants.length();
 
 // As long as it works and is fast...
-Wave waves[] = Wave[](
-	Wave(
-		wave_constants[0]
-		, w(wave_constants[0].L)
-		, Q(wave_constants[0].steepness, w(wave_constants[0].L),
-				wave_constants[0].A, num_waves)
-		, Phi(wave_constants[0].speed, w(wave_constants[0].L))
-	)
-	, Wave(
-		wave_constants[1]
-		, w(wave_constants[1].L)
-		, Q(wave_constants[1].steepness, w(wave_constants[1].L),
-				wave_constants[1].A, num_waves)
-		, Phi(wave_constants[1].speed, w(wave_constants[1].L))
-	)
-	, Wave(
-		wave_constants[2]
-		, w(wave_constants[2].L)
-		, Q(wave_constants[2].steepness, w(wave_constants[2].L),
-				wave_constants[2].A, num_waves)
-		, Phi(wave_constants[2].speed, w(wave_constants[2].L))
-	)
-	, Wave(
-		wave_constants[3]
-		, w(wave_constants[3].L)
-		, Q(wave_constants[3].steepness, w(wave_constants[3].L),
-				wave_constants[3].A, num_waves)
-		, Phi(wave_constants[3].speed, w(wave_constants[3].L))
-	)
-	, Wave(
-		wave_constants[4]
-		, w(wave_constants[4].L)
-		, Q(wave_constants[4].steepness, w(wave_constants[4].L),
-				wave_constants[4].A, num_waves)
-		, Phi(wave_constants[4].speed, w(wave_constants[4].L))
-	)
-	, Wave(
-		wave_constants[5]
-		, w(wave_constants[5].L)
-		, Q(wave_constants[5].steepness, w(wave_constants[5].L),
-				wave_constants[5].A, num_waves)
-		, Phi(wave_constants[5].speed, w(wave_constants[5].L))
-	)
-	, Wave(
-		wave_constants[6]
-		, w(wave_constants[6].L)
-		, Q(wave_constants[6].steepness, w(wave_constants[6].L),
-				wave_constants[6].A, num_waves)
-		, Phi(wave_constants[6].speed, w(wave_constants[6].L))
-	)
-	, Wave(
-		wave_constants[7]
-		, w(wave_constants[7].L)
-		, Q(wave_constants[7].steepness, w(wave_constants[7].L),
-				wave_constants[7].A, num_waves)
-		, Phi(wave_constants[7].speed, w(wave_constants[7].L))
-	)
-);
+Wave[num_waves] init_waves() {
+	Wave ret[num_waves];
+	for (int i = 0; i < num_waves; ++i) {
+		ret[i] = Wave(wave_constants[i],
+			w(wave_constants[i].L),
+			Q(wave_constants[i].steepness, w(wave_constants[i].L), wave_constants[i].A, num_waves),
+			Phi(wave_constants[i].speed, w(wave_constants[i].L))
+		);
+	}
+	return ret;
+}
+
+Wave waves[] = init_waves();
+
+float grestner_max_y() {
+	float y = 0;
+	for (int i = 0; i < waves.length(); ++i) {
+		y += waves[i].constants.A;
+	}
+	return y;
+}
+
+float grestner_min_y() {
+	float y = 0;
+	for (int i = 0; i < waves.length(); ++i) {
+		y -= waves[i].constants.A;
+	}
+	return y;
+}
+
+float max_y = grestner_max_y();
+float min_y = grestner_min_y();
 
 vec3 gerstner_wave(vec2 pos,
 		out float cos_terms[num_waves],
@@ -173,22 +151,6 @@ vec3 grestner_normal(float cos_terms[num_waves], float sin_terms[num_waves]) {
 	return vec3(-x, 1 - y, -z);
 }
 
-float grestner_max_y() {
-	float y = 0;
-	for (int i = 0; i < waves.length(); ++i) {
-		y += waves[i].constants.A;
-	}
-	return y;
-}
-
-float grestner_min_y() {
-	float y = 0;
-	for (int i = 0; i < waves.length(); ++i) {
-		y -= waves[i].constants.A;
-	}
-	return y;
-}
-
 void main() {
 	vec4 p1 = mix(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_TessCoord.x);
 	vec4 p2 = mix(gl_in[2].gl_Position, gl_in[3].gl_Position, gl_TessCoord.x);
@@ -205,6 +167,6 @@ void main() {
 	fUv = mix(uv2, uv1, gl_TessCoord.y);
 
 	fNormal = grestner_normal(cos_terms, sin_terms);
-	fMax_y = grestner_max_y();
-	fMin_y = grestner_min_y();
+	fMax_y = max_y;
+	fMin_y = min_y;
 }
