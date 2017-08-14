@@ -12,7 +12,6 @@
 #include <memory>
 #include <vector>
 
-#include <unistd.h>
 static const char* project_name = "Ripples";
 Window window{ project_name };
 

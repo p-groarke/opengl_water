@@ -42,7 +42,7 @@ void Renderer::load_shader(GLenum shader_type, const std::string& filename) {
 		std::exit(-1);
 	}
 
-	size_t size = f.tellg();
+	auto size = f.tellg();
 	f.seekg(std::ios::beg);
 
 	std::string buffer;

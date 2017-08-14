@@ -44,14 +44,22 @@ struct Wave {
 };
 
 const WaveConstants wave_constants[] = WaveConstants[](
-	WaveConstants(0.8, 0.3, normalize(vec2(1, 0)), 3, 7)
-	, WaveConstants(0.5, 0.1, normalize(vec2(1, 0.2)), 1, 3)
-	, WaveConstants(0.8, 0.2, normalize(vec2(1, -0.3)), 5, 5)
-	, WaveConstants(0.01, 1.5, normalize(vec2(1, -3)), 50, 25)
-	, WaveConstants(0.6, 0.2, normalize(vec2(0, 5)), 10, 0.8)
-	, WaveConstants(1, 2, normalize(vec2(1, 0)), 40, 20)
-	, WaveConstants(0.2, 0.3, normalize(vec2(1, 0.5)), 15, 15)
-	, WaveConstants(0.4, 0.2, normalize(vec2(-1, 0.01)), 2.5, 0.1)
+	  WaveConstants(0.9, 0.1, normalize(vec2(1, 0)), 1, 1)
+	, WaveConstants(0.9, 0.2, normalize(vec2(1, 0)), 2, 2)
+	, WaveConstants(0.9, 0.4, normalize(vec2(1, 0)), 4, 4)
+	, WaveConstants(0.9, 0.8, normalize(vec2(1, 0)), 8, 8)
+	, WaveConstants(0.6, 0.05, normalize(vec2(1, 1)), 1, 1)
+	, WaveConstants(0.6, 0.1, normalize(vec2(1, 1)), 2, 2)
+	, WaveConstants(0.6, 0.2, normalize(vec2(1, 1)), 4, 4)
+	, WaveConstants(0.6, 0.4, normalize(vec2(1, 1)), 8, 8)
+	//WaveConstants(0.8, 0.3, normalize(vec2(1, 0)), 3, 7)
+	//, WaveConstants(0.5, 0.1, normalize(vec2(1, 0.2)), 1, 3)
+	//, WaveConstants(0.8, 0.2, normalize(vec2(1, -0.3)), 5, 5)
+	//, WaveConstants(0.01, 1.5, normalize(vec2(1, -3)), 50, 25)
+	//, WaveConstants(0.6, 0.2, normalize(vec2(0, 5)), 10, 0.8)
+	//, WaveConstants(1, 2, normalize(vec2(1, 0)), 40, 20)
+	//, WaveConstants(0.2, 0.3, normalize(vec2(1, 0.5)), 15, 15)
+	//, WaveConstants(0.4, 0.2, normalize(vec2(-1, 0.01)), 2.5, 0.1)
 );
 const uint num_waves = wave_constants.length();
 

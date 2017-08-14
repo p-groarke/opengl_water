@@ -1,4 +1,5 @@
 #pragma once
+#define NOMINMAX
 #include "engine/component.h"
 #include "engine/window.h"
 

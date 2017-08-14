@@ -53,7 +53,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
-	target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)# /GR-)
+	target_compile_options(${PROJECT_NAME} PRIVATE /W3)# /WX)# /GR-)
 
 endif()
 
@@ -186,5 +186,5 @@ endforeach()
 add_custom_target(Shaders
 	SOURCES ${SHADERS}
 	DEPENDS ${STAMP_FILES})
-set_target_properties(Shaders PROPERTIES FOLDER ${PROJECT_NAME}) # Pretty hacky :)
+# set_target_properties(Shaders PROPERTIES FOLDER ${PROJECT_NAME}) # Pretty hacky :) Doesn't work on VS
 add_dependencies(${PROJECT_NAME} Shaders)

@@ -5,7 +5,8 @@
 #if defined(__APPLE__)
 	#include <mach-o/dyld.h>
 #elif defined(_WIN32)
-	#error Unknown platform
+	#define NOMINMAX
+	#include <windows.h>
 #endif
 
 namespace app {
