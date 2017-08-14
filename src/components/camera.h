@@ -17,7 +17,7 @@ struct Camera : public Component {
 
 	float fov = 80.f;
 	float near_plane = 0.1f;
-	float far_plane = 100.f;
+	float far_plane = 1000.f;
 
 	static Camera* main;
 

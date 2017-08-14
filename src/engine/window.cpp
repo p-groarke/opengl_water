@@ -50,6 +50,7 @@ Window::Window(const char* window_name) {
 	glfwSetCursorPosCallback(window, mouse_pos_callback);
 	glfwSetMouseButtonCallback(window, mouse_butt_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	glfwFocusWindow(window);
 }
 
 Window::~Window() {

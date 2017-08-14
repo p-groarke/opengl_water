@@ -86,6 +86,8 @@ void Water::init() {
 	vp_loc = glGetUniformLocation(program, "VP");
 	model_loc = glGetUniformLocation(program, "M");
 	time_loc = glGetUniformLocation(program, "time");
+	camera_pos_loc = glGetUniformLocation(program, "camera_pos");
+	light_pos_loc = glGetUniformLocation(program, "light_pos");
 
 	vpos_loc = glGetAttribLocation(program, "vPos");
 //		vcol_loc = glGetAttribLocation(program, "vCol");
@@ -159,6 +161,8 @@ void Water::render(float) {
 	glUniformMatrix4fv(model_loc, 1, GL_FALSE,
 			&_transform->get_model()[0][0]);
 	glUniform1f(time_loc, glfwGetTime());
+	Transform* _cam_trans = Camera::main->entity->get_component<Transform>();
+	glUniform3fv(camera_pos_loc, 1, &_cam_trans->position[0]);
 
 	glBindVertexArray(vertex_array);
 //	glDrawArrays(GL_PATCHES, 0, _quads.size() / 3);

@@ -18,7 +18,8 @@ private:
 	Renderer* _renderer;
 
 	GLuint vertex_array, vertex_buffer, uv_buffer, transform_buffer;
-	GLint vp_loc, vpos_loc, model_loc, vuv_loc, time_loc, transform_loc;
+	GLint vp_loc, vpos_loc, model_loc, vuv_loc, time_loc, transform_loc,
+		  camera_pos_loc, light_pos_loc;
 
 	std::vector<glm::vec3> _instance_transforms;
 };
