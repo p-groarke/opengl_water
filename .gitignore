@@ -30,5 +30,6 @@
 
 .DS_Store
 /[Bb]uild*/
+/Win32/
 
 cmake-xcode
