@@ -1,71 +1,79 @@
 #pragma once
-#include "globals.h"
-#include "component.h"
+#include "engine/globals.h"
 
+#include <functional>
 #include <memory>
 #include <vector>
 
+template <class T> struct Component;
+
 struct Entity {
-	Entity();
+//	Entity(const Entity&) = default;
+//	Entity(Entity&&) = default;
+//	Entity& operator=(const Entity&) = default;
+//	Entity& operator=(Entity&&) = default;
 
-	template <class T> T* add_component();
-	template <class T> T* get_component();
+	static void* operator new(std::size_t) = delete;
+	static void* operator new[](std::size_t) = delete;
+
+	inline bool operator==(const Entity& e) {
+		return _id == e._id;
+	}
+
+	inline friend bool operator<(const Entity& lhs, const Entity& rhs) {
+		return lhs._id < rhs._id;
+	}
+
+	template <class T> Component<T> add_component();
+	template <class T> Component<T> get_component();
 	template <class T> void kill_component();
-	void init_components();
-	void update_components(float dt);
-	void render_components(float dt);
-	void destroy_components();
 
-	static Entity* add_entity();
-	static void kill_entity(Entity* e);
-	static void init_entities();
-	static void update_entities(float dt);
-	static void render_entities(float dt);
-	static void destroy_entities();
+	static Entity add_entity();
+	static void kill_entity(Entity e);
+	static void component_kill(std::function<void(Entity)>&& f);
+
+	static Entity dummy;
+
+	// TODO: Enable / disable. Can just enable / disable all components.
 
 private:
-	size_t _id;
-	std::vector<std::unique_ptr<Component>> _components;
+	Entity();
+	Entity(size_t id);
 
-	static size_t id_count;
-	static std::vector<std::unique_ptr<Entity>> _entities;
+	size_t _id;
+
+	static size_t _id_count;
+	static std::vector<Entity> _entities;
+	static std::vector<std::function<void(Entity)>> _components_kill;
+
 };
 
 template <class T>
-T* Entity::add_component() {
-	static_assert(std::is_base_of<Component, T>::value
-			, "Your component needs to inherit Component.");
+Component<T> Entity::add_component() {
+	static_assert(std::is_base_of<Component<T>, T>::value
+			, "Your component needs to inherit Component<>.");
 
-	if (T* ret = get_component<T>()) {
+	auto ret = get_component<T>();
+	if (ret) {
 		OUTPUT_ERROR("Can't add duplicate components in entity.");
 		return ret;
 	}
 
-	_components.emplace_back(std::make_unique<T>());
-	Component* c = _components.back().get();
-	c->entity = this;
-	c->init();
-	return dynamic_cast<T*>(c);
+	return Component<T>::add_component(*this);
 }
 
 template <class T>
-T* Entity::get_component() {
-	for (const auto& x : _components) {
-		if (T* ret = dynamic_cast<T*>(x.get())) {
-			return ret;
-		}
-	}
-	return nullptr;
+Component<T> Entity::get_component() {
+	static_assert(std::is_base_of<Component<T>, T>::value,
+			"Components must inherit Component<>.");
+
+	return Component<T>{*this};
 }
 
 template <class T>
 void Entity::kill_component() {
-	for (size_t i = 0; i < _components.size(); ++i) {
-		if (T* c = dynamic_cast<T*>(_components[i].get())) {
-			c->destroy();
-			std::swap(_components[i], _components.back());
-			_components.pop_back();
-			return;
-		}
-	}
+	static_assert(std::is_base_of<Component<T>, T>::value
+			, "Your component needs to inherit Component<>.");
+
+	Component<T>::kill_component(*this);
 }

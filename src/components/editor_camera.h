@@ -15,10 +15,16 @@ namespace {
 	}
 } // namespace anonymous
 
-struct EditorCamera : public Component {
-	void init() override {
-		_camera = entity->add_component<Camera>();
-		_transform = entity->get_component<Transform>();
+struct EditorCamera : public Component<EditorCamera> {
+	EditorCamera(Entity e)
+		: Component<EditorCamera>(e)
+		, _transform(e)
+		, _camera(e)
+	{}
+
+	void init() {
+		_camera = add_component<Camera>();
+		_transform = entity.get_component<Transform>();
 		_transform->position = { 0.f, 2.f, 5.f };
 
 		Window::main->set_on_mouse_button(std::bind(&EditorCamera::on_mouse_click,
@@ -33,7 +39,7 @@ struct EditorCamera : public Component {
 		_transform->look_at({0.f, 0.f, 0.f});
 	}
 
-	void update(float dt) override {
+	void update(float dt) {
 		/* Shitty but whatever. */
 		if (_right_click) {
 			if (key_down(GLFW_KEY_W)) {
@@ -176,8 +182,8 @@ public:
 	float move_speed = 15.f;
 
 private:
-	Transform* _transform;
-	Camera* _camera;
+	Component<Transform> _transform;
+	Component<Camera> _camera;
 
 	bool _left_click = false;
 	bool _right_click = false;

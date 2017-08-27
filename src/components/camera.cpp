@@ -6,13 +6,18 @@
 
 #include <glm/gtc/matrix_inverse.hpp>
 
-Camera::Camera() {
-	if (Camera::main == nullptr)
-		Camera::main = this;
+Camera::Camera(Entity e)
+	: Component<Camera>(e)
+	, _transform(e)
+{
+	if (!Camera::main_camera_set) {
+		Camera::main = *this;
+		Camera::main_camera_set = true;
+	}
 }
 
 void Camera::init() {
-	_transform = entity->add_component<Transform>();
+	_transform = add_component<Transform>();
 }
 
 glm::mat4 Camera::get_view() {
@@ -28,4 +33,5 @@ glm::mat4 Camera::get_view_projection() {
 	return get_projection() * get_view();
 }
 
-Camera* Camera::main = nullptr;
+Component<Camera> Camera::main{ Entity::dummy };
+bool Camera::main_camera_set = false;

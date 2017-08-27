@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-struct Transform : public Component {
+struct Transform : public Component<Transform> {
 	void look_at(const glm::vec3& target,
 				const glm::vec3& up = { 0.f, 1.f, 0.f })
 	{

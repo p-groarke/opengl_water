@@ -40,7 +40,7 @@ static inline void gl_error_string(char* msg) {
 	}
 }
 
-struct Renderer : public Component {
+struct Renderer : public Component<Renderer> {
 	struct Shader {
 		Shader(GLenum _type)
 			: type(_type)
@@ -51,17 +51,18 @@ struct Renderer : public Component {
 			return handle == std::numeric_limits<unsigned>::max();
 		}
 
-		const GLenum type = 0;
+		GLenum type = 0;
 		GLuint handle = 0;
 	};
 
-	void set_shader_path(const std::string& path);
+	Renderer(Entity e);
+
 	void load_shader(GLenum shader_type, const std::string& filename);
 	void create();
-	void init() override;
-	void update(float dt) override;
-	void render(float dt) override;
-	void destroy() override;
+	void init();
+	void update(float dt);
+	void render(float dt);
+	void destroy();
 
 	GLuint program;
 
@@ -82,5 +83,4 @@ private:
 	#define tess_eval_shader _shaders[2];
 	#define geometry_shader _shaders[3];
 	#define fragment_shader _shaders[4];
-	std::string _relative_path = "";
 };

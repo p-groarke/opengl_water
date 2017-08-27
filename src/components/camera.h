@@ -1,16 +1,17 @@
 #pragma once
 #include "engine/component.h"
+#include "components/transform.h"
 
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-struct Transform;
+struct Camera : public Component<Camera> {
+	Camera(Entity e);
 
-struct Camera : public Component {
-	Camera();
-	void init() override;
+	void init();
+
 	glm::mat4 get_view();
 	glm::mat4 get_projection();
 	glm::mat4 get_view_projection();
@@ -19,8 +20,10 @@ struct Camera : public Component {
 	float near_plane = 0.1f;
 	float far_plane = 1000.f;
 
-	static Camera* main;
+	static Component<Camera> main;
 
 private:
-	Transform* _transform = nullptr;
+	Component<Transform> _transform;
+
+	static bool main_camera_set;
 };

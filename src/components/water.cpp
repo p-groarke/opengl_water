@@ -23,29 +23,6 @@ namespace {
 		1.0, 1.0 // Top-right.
 	};
 
-//	void init_big_quad(std::vector<GLfloat>& quads, int count) {
-//		int offset_y = -(count / 2);
-//		for (int y = 0; y < count; ++y) {
-//			offset_y += 1;
-//			int offset_x = -(count / 2);
-//			for (int x = 0; x < count; ++x) {
-//				offset_x += 1;
-//				quads.push_back(quad[0] + offset_x);
-//				quads.push_back(quad[1] + offset_y);
-//				quads.push_back(quad[2]);
-//				quads.push_back(quad[3] + offset_x);
-//				quads.push_back(quad[4] + offset_y);
-//				quads.push_back(quad[5]);
-//				quads.push_back(quad[6] + offset_x);
-//				quads.push_back(quad[7] + offset_y);
-//				quads.push_back(quad[8]);
-//				quads.push_back(quad[9] + offset_x);
-//				quads.push_back(quad[10] + offset_y);
-//				quads.push_back(quad[11]);
-//			}
-//		}
-//	}
-
 	void gen_positions(std::vector<glm::vec3>& positions, int count) {
 		int offset_y = -(count / 2);
 		for (int y = 0; y < count; ++y) {
@@ -59,23 +36,26 @@ namespace {
 	}
 }
 
+Water::Water(Entity e)
+	: Component<Water>(e)
+	, _transform(e)
+	, _renderer(e)
+{}
+
 void Water::init() {
-	int num_quads = 500;
-//	_quads.reserve(num_quads * num_quads);
-//	init_big_quad(_quads, num_quads);
+	int num_quads = 2;
 
 	_instance_transforms.reserve(num_quads * num_quads);
 	gen_positions(_instance_transforms, num_quads);
 
-	_transform = entity->add_component<Transform>();
+	_transform = entity.add_component<Transform>();
 	_transform->rotation = glm::rotate(_transform->rotation,
 			glm::radians(90.f), { 1.f, 0.f, 0.f });
 //	_transform->scale = { 5.f, 5.f, 5.f };
-	//_transform->scale = { 2.f, 2.f, 2.f };
+	_transform->scale = { 2.f, 2.f, 2.f };
 //	_transform->scale = { 3.f, 3.f, 3.f };
 
-	_renderer = entity->add_component<Renderer>();
-	_renderer->set_shader_path("shaders/");
+	_renderer = add_component<Renderer>();
 	_renderer->load_shader(GL_VERTEX_SHADER, "water_vertex.glsl");
 	_renderer->load_shader(GL_TESS_CONTROL_SHADER, "water_tess_control.glsl");
 	_renderer->load_shader(GL_TESS_EVALUATION_SHADER, "water_tess_eval.glsl");
@@ -161,8 +141,8 @@ void Water::render(float) {
 	glUniformMatrix4fv(model_loc, 1, GL_FALSE,
 			&_transform->get_model()[0][0]);
 	glUniform1f(time_loc, glfwGetTime());
-	Transform* _cam_trans = Camera::main->entity->get_component<Transform>();
-	glUniform3fv(camera_pos_loc, 1, &_cam_trans->position[0]);
+	// Transform* _cam_trans = Camera::main->entity->get_component<Transform>();
+	// glUniform3fv(camera_pos_loc, 1, &_cam_trans->position[0]);
 
 	glBindVertexArray(vertex_array);
 //	glDrawArrays(GL_PATCHES, 0, _quads.size() / 3);

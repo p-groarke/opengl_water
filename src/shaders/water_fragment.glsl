@@ -6,8 +6,8 @@ in vec3 fNormal;
 in float fMax_y;
 in float fMin_y;
 
-uniform vec3 camera_pos;
-uniform vec3 light_pos;
+// uniform vec3 camera_pos;
+// uniform vec3 light_pos;
 
 void main() {
 	vec4 dark_base_color = vec4(0.08, 0.16, 0.16, 1.0);
