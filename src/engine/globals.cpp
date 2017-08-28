@@ -5,7 +5,6 @@
 #if defined(__APPLE__)
 	#include <mach-o/dyld.h>
 #elif defined(_WIN32)
-	#define NOMINMAX
 	#include <windows.h>
 #endif
 
@@ -26,7 +25,7 @@ void init_executable_path() {
 	platform_slash = '\\';
 #endif
 
-	assert(err == 0 && "Problem getting application path.");
+	//assert(err == 0 && "Problem getting application path."); // FIXME
 	path = std::string(app_path);
 	auto slash_index = path.find_last_of(platform_slash);
 	if (slash_index != std::string::npos) {

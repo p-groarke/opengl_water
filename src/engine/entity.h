@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 template <class T> struct Component;
@@ -49,8 +50,9 @@ private:
 	size_t _id;
 
 	static size_t _id_count;
+	static std::unordered_map<size_t, size_t> _lut;
 	static std::vector<Entity> _entities;
-	static std::vector<std::function<void(Entity)>> _components_kill;
+	static std::vector<std::function<void(Entity)>> _kill_component_callback;
 };
 
 template <class T>
@@ -58,12 +60,9 @@ Component<T> Entity::add_component() {
 	static_assert(std::is_base_of<Component<T>, T>::value
 			, "Your component needs to inherit Component<>.");
 
-	auto ret = get_component<T>();
-	if (ret) {
-		OUTPUT_ERROR("Can't add duplicate components in entity. "
-				"Returning existing Component.");
+	/* Don't allow duplicate components. */
+	if (auto ret = get_component<T>())
 		return ret;
-	}
 
 	return Component<T>::add_component(*this);
 }

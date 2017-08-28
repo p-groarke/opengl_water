@@ -115,7 +115,7 @@ void EditorCamera::on_mouse_scroll(double, double y) {
 	}
 
 	if (_right_click) {
-		move_speed += y;
+		move_speed += static_cast<float>(y);
 	}
 }
 

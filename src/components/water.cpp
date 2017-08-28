@@ -134,13 +134,13 @@ void Water::render(float) {
 			&Camera::main->get_view_projection()[0][0]);
 	glUniformMatrix4fv(model_loc, 1, GL_FALSE,
 			&_transform->get_model()[0][0]);
-	glUniform1f(time_loc, glfwGetTime());
+	glUniform1f(time_loc, static_cast<float>(glfwGetTime()));
 	// Transform* _cam_trans = Camera::main->entity->get_component<Transform>();
 	// glUniform3fv(camera_pos_loc, 1, &_cam_trans->position[0]);
 
 	glBindVertexArray(vertex_array);
 //	glDrawArrays(GL_PATCHES, 0, _quads.size() / 3);
-	glDrawArraysInstanced(GL_PATCHES, 0, 4, _instance_transforms.size());
+	glDrawArraysInstanced(GL_PATCHES, 0, 4, static_cast<GLsizei>(_instance_transforms.size()));
 	glBindVertexArray(0);
 }
 

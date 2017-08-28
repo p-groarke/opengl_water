@@ -57,13 +57,13 @@ struct Component {
 //				Engine::component_init(&Component<T>::init);
 //			}
 			if constexpr (is_detected_v<detail::has_update, T>) {
-				Engine::component_update(&Component<T>::update);
+				Engine::component_update(&Component<T>::update_components);
 			}
 			if constexpr (is_detected_v<detail::has_render, T>) {
-				Engine::component_render(&Component<T>::render);
+				Engine::component_render(&Component<T>::render_components);
 			}
 			if constexpr (is_detected_v<detail::has_destroy, T>) {
-				Engine::component_destroy(&Component<T>::destroy);
+				Engine::component_destroy(&Component<T>::destroy_components);
 			}
 			Entity::on_component_kill(
 					static_cast<void(*)(Entity)>(&Component<T>::kill_component));
@@ -89,10 +89,10 @@ protected:
 	Entity entity;
 
 private:
-	static void init();
-	static void update(float dt);
-	static void render(float dt);
-	static void destroy();
+	static void init_components();
+	static void update_components(float dt);
+	static void render_components(float dt);
+	static void destroy_components();
 
 	static std::unordered_map<size_t, size_t> _lut;
 	static std::vector<T> _components;
@@ -161,18 +161,20 @@ void Component<T>::kill_component(Entity e) {
 	printf("Killing %s Component. Entity : ", typeid(T).name());
 	e.debug_print();
 
-	_lut[_components.back().entity.id()] = _lut[e.id()];
+	size_t pos = _lut[e.id()];
+	_lut[_components.back().entity.id()] = pos;
 	if constexpr (is_detected_v<detail::has_destroy, T>) {
-		_components[_lut[e.id()]].destroy();
+		_components[pos].destroy();
 	}
-
-	std::swap(_components[_lut[e.id()]], _components.back());
+	if (_components[pos].entity.id() != _components.back().entity.id()) {
+		std::swap(_components[pos], _components.back());
+	}
 	_components.pop_back();
 	_lut.erase(e.id());
 }
 
 template <class T>
-void Component<T>::init() {
+void Component<T>::init_components() {
 	if constexpr (is_detected_v<detail::has_init, T>) {
 		for (size_t i = 0; i < _components.size(); ++i) {
 			_components[i].init();
@@ -181,7 +183,7 @@ void Component<T>::init() {
 }
 
 template <class T>
-void Component<T>::update(float dt) {
+void Component<T>::update_components(float dt) {
 	if constexpr (is_detected_v<detail::has_update, T>) {
 		for (size_t i = 0; i < _components.size(); ++i) {
 			_components[i].update(dt);
@@ -190,7 +192,7 @@ void Component<T>::update(float dt) {
 }
 
 template <class T>
-void Component<T>::render(float dt) {
+void Component<T>::render_components(float dt) {
 	if constexpr (is_detected_v<detail::has_render, T>) {
 		for (size_t i = 0; i < _components.size(); ++i) {
 			_components[i].render(dt);
@@ -199,7 +201,7 @@ void Component<T>::render(float dt) {
 }
 
 template <class T>
-void Component<T>::destroy() {
+void Component<T>::destroy_components() {
 	if constexpr (is_detected_v<detail::has_destroy, T>) {
 		for (size_t i = 0; i < _components.size(); ++i) {
 			_components[i].destroy();

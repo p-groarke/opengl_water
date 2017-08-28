@@ -52,8 +52,9 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel C++
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
-	target_compile_options(${PROJECT_NAME} PRIVATE /W3)# /WX)# /GR-)
+	# string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
+	target_compile_options(${PROJECT_NAME} PRIVATE /W3 /std:c++17)# /WX)# /GR-)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE NOMINMAX)
 
 endif()
 
