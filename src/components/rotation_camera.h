@@ -3,14 +3,14 @@
 #include "components/camera.h"
 #include "components/transform.h"
 
-struct RotationCamera : public Component {
-	void init_components() override {
-		_camera = entity->add_component<Camera>();
-		_transform = entity->get_component<Transform>();
+struct RotationCamera : public Component<RotationCamera> {
+	void init() {
+		_camera = add_component<Camera>();
+		_transform = get_component<Transform>();
 		_transform->position = { 3.f, 2.f, 2.f };
 	}
 
-	void update_components(float dt) override {
+	void update(float dt) {
 		glm::quat quat = glm::angleAxis(glm::radians(rotation_speed * dt)
 				, glm::vec3{0.f, 1.f, 0.f});
 		_transform->position = quat * _transform->position;
@@ -20,6 +20,6 @@ struct RotationCamera : public Component {
 	float rotation_speed = 2.f;
 
 private:
-	Camera* _camera;
-	Transform* _transform;
+	Component<Camera> _camera;
+	Component<Transform> _transform;
 };

@@ -21,34 +21,10 @@ template <class U>
 using has_render = decltype(std::declval<U>().render(std::declval<float>()));
 template <class U>
 using has_destroy = decltype(std::declval<U>().destroy());
-
-/* Force unused static object compilation hack. */
-template<typename T, T> struct value { };
 } // namespace detail
 
 template<class T>
 struct Component {
-	/* Static constructor */
-//	struct _static_ctor {
-//		_static_ctor()
-//		{
-//			printf("component static constructor\n");
-//			if constexpr (is_detected_v<detail::has_update, T>) {
-//				Engine::component_update(&Component<T>::update);
-//			}
-//			if constexpr (is_detected_v<detail::has_render, T>) {
-//				Engine::component_render(&Component<T>::render);
-//			}
-//			if constexpr (is_detected_v<detail::has_destroy, T>) {
-//				Engine::component_destroy(&Component<T>::destroy);
-//			}
-//			Entity::component_kill(
-//					static_cast<void(*)(Entity)>(&Component<T>::kill_component));
-//		}
-//		static constexpr unsigned char force_compilation = 42;
-//		typedef detail::value<unsigned char&, force_compilation> value_user;
-//	};
-
 	Component(Entity e = Entity::dummy)
 		: entity(e)
 	{
@@ -98,7 +74,6 @@ private:
 
 	static std::unordered_map<size_t, size_t> _lut;
 	static std::vector<T> _components;
-//	static _static_ctor _s_ctor;
 	static bool callbacks_set;
 };
 
@@ -219,5 +194,3 @@ void Component<T>::destroy_components() {
 template <class T> std::unordered_map<size_t, size_t> Component<T>::_lut = {};
 template <class T> std::vector<T> Component<T>::_components = {};
 template <class T> bool Component<T>::callbacks_set = false;
-//template <class T> typename Component<T>::_static_ctor Component<T>::_s_ctor{};
-//template <class T> unsigned char Component<T>::_static_ctor::force_compilation = 42;

@@ -1,8 +1,11 @@
 #pragma once
 #include "engine/window.h"
+#include "engine/component.h"
 
 #include <functional>
 #include <vector>
+
+using static_event = 
 
 struct Engine {
 	Engine(const char* project_name);

@@ -36,7 +36,6 @@ void EditorCamera::init() {
 
 void EditorCamera::destroy()
 {
-	_camera.kill();
 //	for (auto& x : _cleanup_callbacks) {
 //		x();
 //	}

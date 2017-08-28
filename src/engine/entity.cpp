@@ -11,7 +11,7 @@ Entity::Entity(size_t id)
 	: _id(id)
 {}
 
-Entity Entity::add_entity() {
+Entity Entity::new_entity() {
 	_entities.emplace_back(Entity{});
 	_lut[_entities.back().id()] = _entities.size() - 1;
 	return _entities.back();

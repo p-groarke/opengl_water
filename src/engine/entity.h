@@ -40,7 +40,7 @@ struct Entity {
 	template <class T> Component<T> get_component();
 	template <class T> void kill_component();
 
-	static Entity add_entity();
+	static Entity new_entity();
 	static void kill_entity(Entity e);
 	static void on_entity_kill(std::function<void(Entity)>&& f);
 
