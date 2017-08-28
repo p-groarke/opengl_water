@@ -1,16 +1,13 @@
 #pragma once
 #include "engine/component.h"
+#include "components/transform.h"
+#include "components/renderer.h"
 
 #include <glad/glad.h>
 #include <glm/vec3.hpp>
 #include <vector>
 
-struct Transform;
-struct Renderer;
-
 struct Water : public Component<Water> {
-	Water(Entity e);
-
 	void init();
 	void update(float dt);
 	void render(float dt);

@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <vector>
+#include <utility>
 
 struct Window {
 	Window(const char* window_name);
@@ -11,10 +12,11 @@ struct Window {
 
 	void post_render();
 
-	void set_on_key(const std::function<void(int, int, int, int)>& callback);
-	void set_on_mouse_pos(const std::function<void(double, double)>& callback);
-	void set_on_mouse_button(const std::function<void(int, int, int)>& callback);
-	void set_on_mouse_scroll(const std::function<void(double, double)>& callback);
+	/* TODO: User callback setters return a cleanup lambda. */
+	void on_key(std::function<void(int, int, int, int)>&& callback);
+	void on_mouse_pos(std::function<void(double, double)>&& callback);
+	void on_mouse_button(std::function<void(int, int, int)>&& callback);
+	void on_mouse_scroll(std::function<void(double, double)>&& callback);
 
 	/* GLFW callbacks. */
 private:

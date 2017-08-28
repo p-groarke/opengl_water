@@ -6,18 +6,17 @@
 
 #include <glm/gtc/matrix_inverse.hpp>
 
-Camera::Camera(Entity e)
-	: Component<Camera>(e)
-	, _transform(e)
-{
+void Camera::init() {
 	if (!Camera::main_camera_set) {
 		Camera::main = *this;
 		Camera::main_camera_set = true;
 	}
+	_transform = add_component<Transform>();
 }
 
-void Camera::init() {
-	_transform = add_component<Transform>();
+void Camera::destroy() {
+	Camera::main = Component<Camera>{};
+	Camera::main_camera_set = false;
 }
 
 glm::mat4 Camera::get_view() {

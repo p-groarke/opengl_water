@@ -4,10 +4,12 @@
 #include "engine/meta.h"
 #include "engine/engine.h"
 
+#include <cassert>
 #include <cstdlib>
 #include <algorithm>
-#include <map>
 #include <type_traits>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace detail {
@@ -19,14 +21,38 @@ template <class U>
 using has_render = decltype(std::declval<U>().render(std::declval<float>()));
 template <class U>
 using has_destroy = decltype(std::declval<U>().destroy());
+
+/* Force unused static object compilation hack. */
+template<typename T, T> struct value { };
 } // namespace detail
 
 template<class T>
 struct Component {
-	Component(Entity e)
+	/* Static constructor */
+//	struct _static_ctor {
+//		_static_ctor()
+//		{
+//			printf("component static constructor\n");
+//			if constexpr (is_detected_v<detail::has_update, T>) {
+//				Engine::component_update(&Component<T>::update);
+//			}
+//			if constexpr (is_detected_v<detail::has_render, T>) {
+//				Engine::component_render(&Component<T>::render);
+//			}
+//			if constexpr (is_detected_v<detail::has_destroy, T>) {
+//				Engine::component_destroy(&Component<T>::destroy);
+//			}
+//			Entity::component_kill(
+//					static_cast<void(*)(Entity)>(&Component<T>::kill_component));
+//		}
+//		static constexpr unsigned char force_compilation = 42;
+//		typedef detail::value<unsigned char&, force_compilation> value_user;
+//	};
+
+	Component(Entity e = Entity::dummy)
 		: entity(e)
 	{
-		if (!Component<T>::callbacks_set) {
+		if (!Component<T>::callbacks_set && entity != Entity::dummy) {
 //			if constexpr (is_detected_v<detail::has_init, T>) {
 //				Engine::component_init(&Component<T>::init);
 //			}
@@ -39,15 +65,15 @@ struct Component {
 			if constexpr (is_detected_v<detail::has_destroy, T>) {
 				Engine::component_destroy(&Component<T>::destroy);
 			}
-			Entity::component_kill(
+			Entity::on_component_kill(
 					static_cast<void(*)(Entity)>(&Component<T>::kill_component));
 
 			Component<T>::callbacks_set = true;
 		}
 	}
 
-	static void* operator new(std::size_t) = delete;
-	static void* operator new[](std::size_t) = delete;
+	static void* operator new(size_t) = delete;
+	static void* operator new[](size_t) = delete;
 
 	inline operator bool() const;
 	inline T* operator->() const; /* Get this component shortcut. */
@@ -68,21 +94,21 @@ private:
 	static void render(float dt);
 	static void destroy();
 
-	static std::map<Entity, size_t> _lut;
+	static std::unordered_map<size_t, size_t> _lut;
 	static std::vector<T> _components;
+//	static _static_ctor _s_ctor;
 	static bool callbacks_set;
 };
 
 template <class T>
 inline Component<T>::operator bool() const {
-	return _lut.count(entity) != 0;
+	return _lut.count(entity.id()) != 0;
 }
 
 template <class T>
 inline T* Component<T>::operator->() const {
-	if (!*this)
-		return nullptr;
-	return &_components[_lut[entity]];
+	assert(*this == true && "Component doesn't exist.");
+	return &_components[_lut[entity.id()]];
 }
 
 template <class T>
@@ -111,8 +137,14 @@ void Component<T>::kill_component() {
 
 template <class T>
 Component<T> Component<T>::add_component(Entity e) {
-	_components.emplace_back(T{e});
-	_lut[e] = _components.size() - 1;
+	T t;
+	t.entity = e;
+	printf("Constructing %s Component. Entity : ", typeid(T).name());
+	t.entity.debug_print();
+
+	_components.emplace_back(std::move(t));
+//	_components.emplace_back(T{e});
+	_lut[e.id()] = _components.size() - 1;
 
 	if constexpr (is_detected_v<detail::has_init, T>) {
 		_components.back().init();
@@ -123,17 +155,20 @@ Component<T> Component<T>::add_component(Entity e) {
 
 template <class T>
 void Component<T>::kill_component(Entity e) {
-	if (_lut.count(e) == 0)
+	if (_lut.count(e.id()) == 0)
 		return;
 
-	_lut[_components.back().entity] = _lut[e];
-	if constexpr (is_detected_v<detail::has_destroy, T>) {
-		_components[_lut[e]].destroy();
-	}
-	std::swap(_components[_lut[e]], _components.back());
+	printf("Killing %s Component. Entity : ", typeid(T).name());
+	e.debug_print();
 
+	_lut[_components.back().entity.id()] = _lut[e.id()];
+	if constexpr (is_detected_v<detail::has_destroy, T>) {
+		_components[_lut[e.id()]].destroy();
+	}
+
+	std::swap(_components[_lut[e.id()]], _components.back());
 	_components.pop_back();
-	_lut.erase(e);
+	_lut.erase(e.id());
 }
 
 template <class T>
@@ -172,6 +207,8 @@ void Component<T>::destroy() {
 	}
 }
 
-template <class T> std::map<Entity, size_t> Component<T>::_lut = {};
+template <class T> std::unordered_map<size_t, size_t> Component<T>::_lut = {};
 template <class T> std::vector<T> Component<T>::_components = {};
 template <class T> bool Component<T>::callbacks_set = false;
+//template <class T> typename Component<T>::_static_ctor Component<T>::_s_ctor{};
+//template <class T> unsigned char Component<T>::_static_ctor::force_compilation = 42;

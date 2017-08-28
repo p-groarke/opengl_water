@@ -8,20 +8,27 @@
 template <class T> struct Component;
 
 struct Entity {
-//	Entity(const Entity&) = default;
-//	Entity(Entity&&) = default;
-//	Entity& operator=(const Entity&) = default;
-//	Entity& operator=(Entity&&) = default;
+	static void* operator new(size_t) = delete;
+	static void* operator new[](size_t) = delete;
 
-	static void* operator new(std::size_t) = delete;
-	static void* operator new[](std::size_t) = delete;
-
-	inline bool operator==(const Entity& e) {
+	inline bool operator==(const Entity& e) const {
 		return _id == e._id;
 	}
-
+	
+	inline bool operator!=(const Entity& e) const {
+		return _id != e._id;
+	}
+	
 	inline friend bool operator<(const Entity& lhs, const Entity& rhs) {
 		return lhs._id < rhs._id;
+	}
+
+	inline size_t id() const {
+		return _id;
+	}
+	
+	inline void debug_print() const {
+		printf("%zu\n", _id);
 	}
 
 	template <class T> Component<T> add_component();
@@ -30,12 +37,11 @@ struct Entity {
 
 	static Entity add_entity();
 	static void kill_entity(Entity e);
-	static void component_kill(std::function<void(Entity)>&& f);
+	static void on_component_kill(std::function<void(Entity)>&& f);
 
-	static Entity dummy;
+	static const Entity dummy;//{ std::numeric_limits<size_t>::max() };
 
 	// TODO: Enable / disable. Can just enable / disable all components.
-
 private:
 	Entity();
 	Entity(size_t id);
@@ -45,7 +51,6 @@ private:
 	static size_t _id_count;
 	static std::vector<Entity> _entities;
 	static std::vector<std::function<void(Entity)>> _components_kill;
-
 };
 
 template <class T>
@@ -55,7 +60,8 @@ Component<T> Entity::add_component() {
 
 	auto ret = get_component<T>();
 	if (ret) {
-		OUTPUT_ERROR("Can't add duplicate components in entity.");
+		OUTPUT_ERROR("Can't add duplicate components in entity. "
+				"Returning existing Component.");
 		return ret;
 	}
 

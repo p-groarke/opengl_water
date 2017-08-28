@@ -32,10 +32,6 @@ static inline bool gl_shader_was_compiled(int id) {
 std::string _relative_path = "shaders/";
 } // namespace anonymous
 
-Renderer::Renderer(Entity e)
-	: Component<Renderer>(e)
-{}
-
 void Renderer::load_shader(GLenum shader_type, const std::string& filename) {
 	std::string path = app::path + _relative_path + filename;
 	std::ifstream f(path, std::ios::binary | std::ios::ate);

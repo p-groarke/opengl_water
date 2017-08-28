@@ -64,19 +64,23 @@ void Window::post_render() {
 	glfwPollEvents();
 }
 
-void Window::set_on_key(const std::function<void(int, int, int, int)>& callback) {
+void Window::on_key(std::function<void(int, int, int, int)>&& callback)
+{
 	key_user_callbacks.emplace_back(callback);
 }
 
-void Window::set_on_mouse_pos(const std::function<void(double, double)>& callback) {
+void Window::on_mouse_pos(std::function<void(double, double)>&& callback)
+{
 	mouse_pos_user_callbacks.emplace_back(callback);
 }
 
-void Window::set_on_mouse_button(const std::function<void(int, int, int)>& callback) {
+void Window::on_mouse_button(std::function<void(int, int, int)>&& callback)
+{
 	mouse_butt_user_callbacks.emplace_back(callback);
 }
 
-void Window::set_on_mouse_scroll(const std::function<void(double, double)>& callback) {
+void Window::on_mouse_scroll(std::function<void(double, double)>&& callback)
+{
 	mouse_scroll_user_callbacks.emplace_back(callback);
 }
 

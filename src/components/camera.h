@@ -8,9 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 struct Camera : public Component<Camera> {
-	Camera(Entity e);
-
 	void init();
+	void destroy();
 
 	glm::mat4 get_view();
 	glm::mat4 get_projection();

@@ -36,12 +36,6 @@ namespace {
 	}
 }
 
-Water::Water(Entity e)
-	: Component<Water>(e)
-	, _transform(e)
-	, _renderer(e)
-{}
-
 void Water::init() {
 	int num_quads = 2;
 

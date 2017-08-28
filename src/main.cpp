@@ -12,6 +12,17 @@ int main(int, char**) {
 	Entity water_e = Entity::add_entity();
 	water_e.add_component<Water>();
 
+	Entity::kill_entity(water_e);
+
+	water_e = Entity::add_entity();
+	water_e.add_component<Water>();
+
+	Entity::kill_entity(camera_e);
+
+	Entity camera_e2 = Entity::add_entity();
+	camera_e2.add_component<EditorCamera>();
+
+
 	engine.doit();
 
 	return 0;

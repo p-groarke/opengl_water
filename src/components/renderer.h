@@ -55,8 +55,6 @@ struct Renderer : public Component<Renderer> {
 		GLuint handle = 0;
 	};
 
-	Renderer(Entity e);
-
 	void load_shader(GLenum shader_type, const std::string& filename);
 	void create();
 	void init();
