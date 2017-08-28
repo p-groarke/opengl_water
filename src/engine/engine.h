@@ -2,10 +2,9 @@
 #include "engine/window.h"
 #include "engine/component.h"
 
+#include <chrono>
 #include <functional>
 #include <vector>
-
-using static_event = 
 
 struct Engine {
 	Engine(const char* project_name);
@@ -15,8 +14,12 @@ struct Engine {
 	static void component_update(std::function<void(float)>&& f);
 	static void component_render(std::function<void(float)>&& f);
 	static void component_destroy(std::function<void()>&& f);
+
 private:
+	float get_dt();
+
 	Window window;
+	std::chrono::high_resolution_clock::time_point new_frame_time;
 
 //	static std::vector<std::function<void()>> _components_init;
 	static std::vector<std::function<void(float)>> _components_update;
