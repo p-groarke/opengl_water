@@ -65,7 +65,7 @@ struct Component {
 			if constexpr (is_detected_v<detail::has_destroy, T>) {
 				Engine::component_destroy(&Component<T>::destroy_components);
 			}
-			Entity::on_component_kill(
+			Entity::on_entity_kill(
 					static_cast<void(*)(Entity)>(&Component<T>::kill_component));
 
 			Component<T>::callbacks_set = true;
@@ -77,6 +77,8 @@ struct Component {
 
 	inline operator bool() const;
 	inline T* operator->() const; /* Get this component shortcut. */
+
+	inline void kill();
 
 	template <class U> Component<U> add_component();
 	template <class U> Component<U> get_component();
@@ -109,6 +111,11 @@ template <class T>
 inline T* Component<T>::operator->() const {
 	assert(*this == true && "Component doesn't exist.");
 	return &_components[_lut[entity.id()]];
+}
+
+template <class T>
+inline void Component<T>::kill() {
+	Component<T>::kill_component(entity);
 }
 
 template <class T>

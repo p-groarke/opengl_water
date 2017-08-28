@@ -18,8 +18,8 @@ Entity Entity::add_entity() {
 }
 
 void Entity::kill_entity(Entity e) {
-	for (size_t i = 0; i < _kill_component_callback.size(); ++i) {
-		_kill_component_callback[i](e);
+	for (size_t i = 0; i < _entity_kill_callback.size(); ++i) {
+		_entity_kill_callback[i](e);
 	}
 
 	size_t pos = _lut[e._id];
@@ -31,12 +31,12 @@ void Entity::kill_entity(Entity e) {
 	_lut.erase(e._id);
 }
 
-void Entity::on_component_kill(std::function<void(Entity)>&& f) {
-	Entity::_kill_component_callback.emplace_back(f);
+void Entity::on_entity_kill(std::function<void(Entity)>&& f) {
+	Entity::_entity_kill_callback.emplace_back(f);
 }
 
 const Entity Entity::dummy{ std::numeric_limits<size_t>::max() };
 size_t Entity::_id_count = 0;
 std::unordered_map<size_t, size_t> Entity::_lut = {};
 std::vector<Entity> Entity::_entities = {};
-std::vector<std::function<void(Entity)>> Entity::_kill_component_callback = {};
+std::vector<std::function<void(Entity)>> Entity::_entity_kill_callback = {};

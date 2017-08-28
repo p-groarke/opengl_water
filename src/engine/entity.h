@@ -28,6 +28,10 @@ struct Entity {
 		return _id;
 	}
 	
+	inline void kill() {
+		Entity::kill_entity(*this);
+	}
+
 	inline void debug_print() const {
 		printf("%zu\n", _id);
 	}
@@ -38,7 +42,7 @@ struct Entity {
 
 	static Entity add_entity();
 	static void kill_entity(Entity e);
-	static void on_component_kill(std::function<void(Entity)>&& f);
+	static void on_entity_kill(std::function<void(Entity)>&& f);
 
 	static const Entity dummy;//{ std::numeric_limits<size_t>::max() };
 
@@ -52,7 +56,7 @@ private:
 	static size_t _id_count;
 	static std::unordered_map<size_t, size_t> _lut;
 	static std::vector<Entity> _entities;
-	static std::vector<std::function<void(Entity)>> _kill_component_callback;
+	static std::vector<std::function<void(Entity)>> _entity_kill_callback;
 };
 
 template <class T>

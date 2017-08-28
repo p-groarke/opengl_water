@@ -21,7 +21,16 @@ int main(int, char**) {
 
 	Entity camera_e2 = Entity::add_entity();
 	camera_e2.add_component<EditorCamera>();
+	camera_e2.kill_component<EditorCamera>();
+	camera_e2.kill_component<Camera>();
+	camera_e2.kill_component<Transform>();
+	camera_e2.add_component<EditorCamera>();
+	camera_e2.kill_component<Transform>();
+	camera_e2.add_component<Transform>();
+	camera_e2.kill();
 
+	camera_e2 = Entity::add_entity();
+	camera_e2.add_component<EditorCamera>();
 
 	engine.doit();
 

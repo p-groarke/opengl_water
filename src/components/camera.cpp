@@ -15,6 +15,7 @@ void Camera::init() {
 }
 
 void Camera::destroy() {
+	kill_component<Transform>();
 	Camera::main = Component<Camera>{};
 	Camera::main_camera_set = false;
 }
