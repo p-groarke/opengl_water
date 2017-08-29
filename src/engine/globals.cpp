@@ -18,14 +18,13 @@ void init_executable_path() {
 	uint32_t size = 512;
 	char app_path[size];
 	int err = _NSGetExecutablePath(app_path, &size);
-
+	assert(err == 0 && "Problem getting application path.");
 #elif defined(_WIN32)
 	TCHAR app_path[MAX_PATH];
 	int err = GetModuleFileName(NULL, app_path, MAX_PATH);
 	platform_slash = '\\';
-#endif
-
 	//assert(err == 0 && "Problem getting application path."); // FIXME
+#endif
 	path = std::string(app_path);
 	auto slash_index = path.find_last_of(platform_slash);
 	if (slash_index != std::string::npos) {

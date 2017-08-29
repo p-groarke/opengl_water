@@ -1,6 +1,5 @@
 #pragma once
 #include "engine/window.h"
-#include "engine/component.h"
 
 #include <chrono>
 #include <functional>
