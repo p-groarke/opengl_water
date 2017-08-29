@@ -1,5 +1,5 @@
-#include "components/editor_camera.h"
-#include "engine/window.h"
+#include "components/editor_camera.hpp"
+#include "engine/window.hpp"
 
 #include <functional>
 

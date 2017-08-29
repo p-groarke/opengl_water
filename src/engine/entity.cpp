@@ -1,5 +1,5 @@
-#include "engine/entity.h"
-#include "engine/engine.h"
+#include "engine/entity.hpp"
+#include "engine/engine.hpp"
 
 #include <limits>
 

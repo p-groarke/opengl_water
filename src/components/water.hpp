@@ -1,7 +1,7 @@
 #pragma once
-#include "engine/component.h"
-#include "components/transform.h"
-#include "components/renderer.h"
+#include "engine/component.hpp"
+#include "components/transform.hpp"
+#include "components/renderer.hpp"
 
 #include <glad/glad.h>
 #include <glm/vec3.hpp>

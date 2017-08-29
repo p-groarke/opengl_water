@@ -1,7 +1,7 @@
 #pragma once
-#include "engine/entity.h"
-#include "engine/meta.h"
-#include "engine/engine.h"
+#include "engine/entity.hpp"
+#include "engine/meta.hpp"
+#include "engine/engine.hpp"
 
 #include <cassert>
 #include <cstdlib>

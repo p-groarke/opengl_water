@@ -1,6 +1,6 @@
 #pragma once
-#include "engine/component.h"
-#include "engine/window.h"
+#include "engine/component.hpp"
+#include "engine/window.hpp"
 
 #include <string>
 #include <limits>

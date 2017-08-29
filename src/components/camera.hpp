@@ -1,6 +1,6 @@
 #pragma once
-#include "engine/component.h"
-#include "components/transform.h"
+#include "engine/component.hpp"
+#include "components/transform.hpp"
 
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>

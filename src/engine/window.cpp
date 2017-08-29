@@ -1,5 +1,5 @@
-#include "window.h"
-#include "engine.h"
+#include "window.hpp"
+#include "engine.hpp"
 
 #include <cstdlib>
 

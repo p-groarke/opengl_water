@@ -1,7 +1,7 @@
-#include "engine/engine.h"
-#include "components/editor_camera.h"
-#include "components/water.h"
-#include "components/rotation_camera.h"
+#include "engine/engine.hpp"
+#include "components/editor_camera.hpp"
+#include "components/water.hpp"
+#include "components/rotation_camera.hpp"
 
 static const char* project_name = "Ripples";
 Engine engine{ project_name };

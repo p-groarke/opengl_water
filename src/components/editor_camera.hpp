@@ -1,7 +1,7 @@
 #pragma once
-#include "engine/component.h"
-#include "components/transform.h"
-#include "components/camera.h"
+#include "engine/component.hpp"
+#include "components/transform.hpp"
+#include "components/camera.hpp"
 
 #include <array>
 #include <utility>

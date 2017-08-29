@@ -1,9 +1,9 @@
-#include "components/water.h"
-#include "engine/entity.h"
-#include "engine/window.h"
-#include "components/transform.h"
-#include "components/renderer.h"
-#include "components/camera.h"
+#include "components/water.hpp"
+#include "engine/entity.hpp"
+#include "engine/window.hpp"
+#include "components/transform.hpp"
+#include "components/renderer.hpp"
+#include "components/camera.hpp"
 
 namespace {
 	static const GLfloat quad[] = {

@@ -1,7 +1,7 @@
 #pragma once
-#include "engine/component.h"
-#include "components/camera.h"
-#include "components/transform.h"
+#include "engine/component.hpp"
+#include "components/camera.hpp"
+#include "components/transform.hpp"
 
 struct RotationCamera : public Component<RotationCamera> {
 	void init() {

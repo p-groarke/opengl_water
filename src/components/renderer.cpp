@@ -1,4 +1,4 @@
-#include "components/renderer.h"
+#include "components/renderer.hpp"
 
 #include <fstream>
 #include <iostream>

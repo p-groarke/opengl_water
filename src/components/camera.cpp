@@ -1,8 +1,8 @@
-#include "components/camera.h"
+#include "components/camera.hpp"
 
-#include "engine/entity.h"
-#include "engine/window.h"
-#include "components/transform.h"
+#include "engine/entity.hpp"
+#include "engine/window.hpp"
+#include "components/transform.hpp"
 
 #include <glm/gtc/matrix_inverse.hpp>
 

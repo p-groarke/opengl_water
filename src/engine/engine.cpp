@@ -1,5 +1,5 @@
-#include "engine/engine.h"
-#include "components/renderer.h"
+#include "engine/engine.hpp"
+#include "components/renderer.hpp"
 
 #include <chrono>
 
