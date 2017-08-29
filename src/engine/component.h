@@ -1,5 +1,4 @@
 #pragma once
-#include "engine/globals.h"
 #include "engine/entity.h"
 #include "engine/meta.h"
 #include "engine/engine.h"

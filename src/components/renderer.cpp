@@ -1,5 +1,4 @@
 #include "components/renderer.h"
-#include "engine/globals.h"
 
 #include <fstream>
 #include <iostream>
@@ -33,7 +32,7 @@ std::string _relative_path = "shaders/";
 } // namespace anonymous
 
 void Renderer::load_shader(GLenum shader_type, const std::string& filename) {
-	std::string path = app::path + _relative_path + filename;
+	std::string path = Engine::folder_path + _relative_path + filename;
 	std::ifstream f(path, std::ios::binary | std::ios::ate);
 	if (!f.is_open()) {
 		OUTPUT_ERROR("Couldn't read shader file : %s", path.c_str());

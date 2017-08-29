@@ -1,5 +1,5 @@
 #include "window.h"
-#include "globals.h"
+#include "engine.h"
 
 #include <cstdlib>
 

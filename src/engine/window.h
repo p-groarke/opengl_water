@@ -13,6 +13,7 @@ struct Window {
 	void post_render();
 
 	/* TODO: User callback setters return a cleanup lambda. */
+	/* TODO: Real input context system. */
 	void on_key(std::function<void(int, int, int, int)>&& callback);
 	void on_mouse_pos(std::function<void(double, double)>&& callback);
 	void on_mouse_button(std::function<void(int, int, int)>&& callback);

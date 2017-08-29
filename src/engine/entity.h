@@ -1,5 +1,4 @@
 #pragma once
-#include "engine/globals.h"
 
 #include <functional>
 #include <memory>
@@ -15,11 +14,11 @@ struct Entity {
 	inline bool operator==(const Entity& e) const {
 		return _id == e._id;
 	}
-	
+
 	inline bool operator!=(const Entity& e) const {
 		return _id != e._id;
 	}
-	
+
 	inline friend bool operator<(const Entity& lhs, const Entity& rhs) {
 		return lhs._id < rhs._id;
 	}
@@ -27,7 +26,7 @@ struct Entity {
 	inline size_t id() const {
 		return _id;
 	}
-	
+
 	inline void kill() {
 		Entity::kill_entity(*this);
 	}
